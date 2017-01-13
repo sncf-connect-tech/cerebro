@@ -1,0 +1,90 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<html>
+<head>
+  <base href="/cerebro">
+
+  <title>Cerebro - Notifications</title>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="forms.css">
+  <link rel="stylesheet" href="node_modules/nouislider/distribute/nouislider.css">
+  <link rel="stylesheet" href="node_modules/ng2-toastr/bundles/ng2-toastr.min.css"/>
+  <link rel="stylesheet" href="node_modules/intro.js/introjs.css"/>
+
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <!-- 1. Load libraries -->
+  <!-- Polyfill(s) for older browsers -->
+  <script src="node_modules/core-js/client/shim.min.js"></script>
+
+  <script src="node_modules/zone.js/dist/zone.js"></script>
+  <script src="node_modules/reflect-metadata/Reflect.js"></script>
+  <script src="node_modules/systemjs/dist/system.src.js"></script>
+  <script src="node_modules/ng2-toastr/bundles/ng2-toastr.min.js"></script>
+  <script src="node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <!--<script src="node_modules/keycloak/keycloak.min.js"></script>-->
+  <script src="node_modules/ng2-bs3-modal/bundles/ng2-bs3-modal.js"></script>
+  <script src="node_modules/intro.js/intro.js"></script>
+
+  <!-- 2. Configure SystemJS -->
+  <script src="systemjs.config.js"></script>
+  <script>
+    System.import('app').catch(function(err){ console.error(err); });
+  </script>
+</head>
+
+<!-- 3. Display the application -->
+<body role="document">
+  <div class="container" role="main">
+    <cerebro-app>
+      <div class="text-center" id="logo-zone"></div>
+      <p class="text-center">Loading, please wait...</p>
+      <div class="col-xs-2 col-xs-offset-5">
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </cerebro-app>
+  </div>
+</body>
+<script>
+  //load config file
+  $.getJSON('config/globals.json', function(data){
+    if(data && data.theme.logo) {
+      var elem = document.createElement("img");
+      elem.src = data.theme.logo;
+      elem.height = 128;
+      elem.width= 128;
+      elem.alt = "Cerebro (logo)";
+      document.getElementById("logo-zone").appendChild(elem);
+    }
+  });
+</script>
+
+
+
+</html>

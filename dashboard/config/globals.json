@@ -1,0 +1,27 @@
+{
+  "sep": "/",
+  "services_url": "http://localhost:8080/cerebro-services",  
+  "theme": {
+    "headerImage": "https://i.ytimg.com/vi/tSSIIu0fVaQ/maxresdefault.jpg",
+    "logo": "https://apprecs.com/ios-meta/app-icons/256/869718796.jpg"
+  },
+  "contacts": {
+    "documentation": {
+      "name": "Wiki",
+      "url": "http://<insert_wiki_page_here>"
+    },
+    "chat": {
+      "name": "IM",
+      "url": "http://<insert_chat_service_here>"
+    },
+    "issueTracker": {
+      "name": "Issues",
+      "url": "http://<insert_issue_tracker_here>"
+    },
+    "about": {
+      "homepage": "https://github.com/voyages-sncf-technologies/cerebro",
+      "author": "VSCT"
+    },
+    "email": "mailto:<insert_email_here>"
+  }
+}

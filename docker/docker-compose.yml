@@ -1,0 +1,63 @@
+version: '2'
+
+services:
+  mongodb:
+    image: mongo:3.2
+    command: mongod --smallfiles --quiet --logpath=/dev/null
+    ports:
+      - 27017:27017
+
+  graphite:
+    image: sitespeedio/graphite:0.9.14
+    ports:
+      - 8081:80
+      - 2003:2003
+    volumes:
+      - ./properties/graphite.conf:/etc/nginx/sites-available/graphite.conf
+
+  collectd:
+    image: listhub/collectd-write-graphite
+    links:
+      - graphite
+    environment:
+      HOST_NAME: sample
+      GRAPHITE_HOST: graphite
+      GRAPHITE_PORT: 2003
+      INSTANCE_ID: seyren
+
+  seyren:
+    image: java:8-jre
+    links:
+      - mongodb
+      - graphite
+    command: /bin/bash -c "wget https://github.com/scobal/seyren/releases/download/1.5.0/seyren-1.5.0.jar -nv && java -jar seyren-1.5.0.jar"
+    environment:
+      MONGO_URL: mongodb://mongodb:27017/seyren
+      GRAPHITE_URL: http://graphite
+      SEYREN_LOG_PATH: /root
+    ports:
+      - 8000:8080
+
+  cerebro-src:
+    # Need to have built the image, read the README.adoc
+    build: .
+
+  cerebro-services:
+    image: openjdk:8-jdk
+    working_dir: /opt/cerebro-services
+    command: ["java", "-jar", "cerebro-services.jar", "--seyren.host=http://seyren:8080", "--graphite.sources[0].url=http://localhost:8081"]
+    ports:
+     - 8080:8080
+    links:
+      - seyren:seyren
+    volumes_from:
+      - cerebro-src
+
+  cerebro-dashboard:
+    image: httpd:2.4
+    ports:
+     - 80:80
+    volumes_from:
+     - cerebro-src
+    volumes:
+      - ./properties/httpd.conf:/usr/local/apache2/conf/httpd.conf

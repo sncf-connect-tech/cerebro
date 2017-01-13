@@ -1,0 +1,35 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<configuration debug="true">
+    <property scope="system" resource="config/application.properties"/>
+    <property scope="system" name="instance" value="${instance:-LOCALHOST}}"/>
+    <if condition='isDefined("env")'>
+        <then>
+            <property scope="local" name="application-logback-conf" value="${application.basedir}/config/${env}/logback.xml"/>
+        </then>
+    </if>
+    <if condition='isDefined("cerebro.logback.conf")'>
+        <then>
+            <property scope="local" name="application-logback-conf" value="${cerebro.logback.conf}"/>
+        </then>
+    </if>
+    <include resource="config/logback.xml"/>
+    <include file="${application-logback-conf}}" optional="true"/>
+
+</configuration>

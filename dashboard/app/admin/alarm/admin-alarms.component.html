@@ -1,0 +1,104 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="container">
+    <div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+    <h1>Alarms stats</h1>
+
+<br />
+<div class="row cardAdmin">
+    <div class="col-lg-3 col-md-4">
+        <div class="panel panel-blue">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <span class="glyphicon glyphicon-play stats_icon"></span>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge"><h3>{{nbEnabledAlarm}}</h3></div>
+                        <div><br>Enabled alarms</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4">
+        <div class="panel panel-green">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <span class="glyphicon glyphicon-pause stats_icon"></span>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge"><h3>{{nbDisabledAlarm}}</h3></div>
+                        <div><br>Disabled alarms</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4">
+        <div class="panel panel-yellow">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <span class="glyphicon glyphicon-list stats_icon"></span>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge"><h3>{{nbTotalAlarm}}</h3></div>
+                        <div><br>Total alarms</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4">
+        <div class="panel panel-red">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <span class="glyphicon glyphicon-eye-close stats_icon"></span>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge"><h3>{{nbAlarmWithoutSub}}</h3></div>
+                        <div>Alarms enabled with no subscribers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<h3>Longest <em>targets</em></h3>
+<table class="table table-striped">
+    <thead>
+      <tr>
+          <th>Alarm</th>
+          <th>Graphite <em>target</em></th>
+          <th>Length</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let alarm of (alarms | topTargetGraphite )">
+          <td [title]="alarm.name"><a (click)="gotoDetail(alarm.id)" style="cursor: pointer">{{alarm.name | emailSub}}</a></td>
+          <td [title]="alarm.target"><kbd class="target">{{alarm.target | emailSub}}</kbd></td>
+          <td>{{alarm.target.length}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

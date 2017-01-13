@@ -1,0 +1,94 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div [attr.data-step]="hidden ? null : 1" [attr.data-intro]="hidden ? null : introTexts[0]" data-position="top"><h3>Summary</h3>
+<div>
+    <div class="row">
+        <div class="col-xs-3 espace">Name</div>
+        <div class="col-xs-9  pull-left">{{ alarm.name }} <span *ngIf="existedAlarm"><span class="glyphicon glyphicon-arrow-right"></span> {{identicalAlarm.name}}</span></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-3 espace">Description</div>
+        <div class="col-xs-9 pull-left">{{ alarm.description }} <span *ngIf="existedAlarm"><span class="glyphicon glyphicon-arrow-right"></span> {{identicalAlarm.description}}</span></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-3 espace">Raw <em>target</em> <a href="https://graphite.readthedocs.org/en/0.9.12/functions.html" target="_functions"><span class="glyphicon glyphicon-info-sign"></span></a></div>
+        <div class="col-xs-9 pull-left"><kbd class="target">{{alarm.target}}</kbd></div>
+    </div>
+    <div class="row" [attr.data-step]="hidden ? null : 2" [attr.data-intro]="hidden ? null : introTexts[1]">
+        <div class="col-xs-3 espace">Alarm function (actual <em>target</em>) <a href="https://graphite.readthedocs.org/en/0.9.12/functions.html" target="_functions"><span class="glyphicon glyphicon-info-sign"></span></a></div>
+        <div class="col-xs-9 pull-left"><kbd class="target">{{targetThresholdFunction}}</kbd></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-3 espace">Thresholds (warning / error)</div>
+        <div class="col-xs-9 pull-left">
+            <span class="label label-warning" style="font-size: small">{{alarm.warn}}
+                <span *ngIf="compareMethods === 'divideSeries'"> %</span>
+            </span>&nbsp;/&nbsp;<span class="label label-danger" style="font-size: small">{{alarm.error}}
+            <span *ngIf="compareMethods === 'divideSeries'"> %</span></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-3 espace">Sampling window </div>
+        <div class="col-xs-9 pull-left espace"><span class="label label-primary" style="font-size: small">{{alarm.from}}</span> / <span class="label label-primary" style="font-size: small">{{alarm.until}}</span></div>
+    </div>
+</div>
+
+<h3>Preview</h3>
+<target-overview [alarm]="alarm" [target]="targetThresholdFunction"></target-overview>
+<br>
+
+<h3>Subscription</h3>
+<span class="badge" style="font-size: small"><span class="glyphicon glyphicon-user"></span> {{alarm.subscriptions[0].target}}</span>
+<span>Subscribed to following status</span>
+<div class="btn-group" data-toggle="buttons">
+    <button type="button" data-toggle="button" class="btn btn-warning toggle-status active" disabled title="WARN"
+            *ngIf="!isIgnoreStatus('ignoreWarn')"><span class="glyphicon glyphicon-bell"></span></button>
+    <button type="button" data-toggle="button" class="btn btn-danger toggle-status active" disabled title="ERROR"
+            *ngIf="!isIgnoreStatus('ignoreError')"><span class="glyphicon glyphicon-bell"></span></button>
+    <button type="button" data-toggle="button" class="btn btn-success toggle-status active" disabled title="OK"
+            *ngIf="!isIgnoreStatus('ignoreOk')"><span class="glyphicon glyphicon-bell"></span></button>
+    <button type="button" data-toggle="button" class="btn btn-default toggle-status active" disabled title="UNKNOWN"
+            *ngIf="!isIgnoreStatus('ignoreUnknown')"><span class="glyphicon glyphicon-bell"></span></button>
+</div>
+<span> on </span>
+<div class="btn-group" data-toggle="buttons">
+    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].mo" disabled title="Monday">M</button>
+    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].tu" disabled title="Tuesday">T</button>
+    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].we" disabled title="Wednesday">W</button>
+    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].th" disabled title="Thursday">J</button>
+    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].fr" disabled title="Friday">F</button>
+    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].sa" disabled title="Saturday">S</button>
+    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].su" disabled title="Sunday">S</button>
+</div>
+<span>from {{alarm.subscriptions[0].fromTime | subscriptionTimeFormat}} to {{alarm.subscriptions[0].toTime | subscriptionTimeFormat}}</span>
+</div>
+<br>
+<br>
+<br>
+<button class="btn btn-default" (click)="goBack()" [attr.data-step]="hidden ? null : 3"
+        [attr.data-intro]="hidden ? null : introTexts[2]" data-position="top">
+    Back <span class="glyphicon glyphicon-step-backward text-danger"></span>
+</button>
+<button type="button" class="btn btn-default" (click)="openPreview()" tabindex="1" [attr.data-step]="hidden ? null : 4"
+        [attr.data-intro]="hidden ? null : introTexts[3]" data-position="top">
+    <span class="glyphicon glyphicon-zoom-in text-info"></span> Preview...</button>
+<button id="confirm-alarm-creation" class="btn btn-default" (click)="submit()" [disabled]="existedSubscription" tabindex="2" [attr.data-step]="hidden ? null : 5"
+        [attr.data-intro]="hidden ? null : introTexts[4]" data-position="top">
+    Finish <span class="glyphicon glyphicon-ok text-success"></span>
+</button>

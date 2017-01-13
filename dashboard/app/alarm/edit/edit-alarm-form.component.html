@@ -1,0 +1,200 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<modal #updateAlarmModal [cssClass]="'very-large-modal'">
+    <modal-header [show-close]="true">
+        <h3 class="modal-title">Edition of alarm {{alarm.name}}</h3>
+    </modal-header>
+    <modal-body>
+		<div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+		<!--{{diagnostic}}-->
+		<div [hidden]="submitted">
+		    <div class="progress">
+		        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
+		            <span class="sr-only">Step 1/2</span>
+		        </div>
+		    </div>
+		    <div class="well">
+		        <p>Most alarm parameters can be edited. For more options or previews, use the <em>Create an alarm...</em> form.</p>
+		    </div>
+		    <h3>Parameters</h3>
+		    <form (ngSubmit)="onSubmitStep1()" #updateAlarmForm="ngForm">
+		        <div>
+		            <div class="row">
+		                <div class="col-sm-4 form-group"><label for="name">Name</label></div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="text" class="form-control" [(ngModel)]="alarm.name" id="name" name="name" ngControl="name" required #name="ngModel"
+                                   placeholder="Name (included in email subjects)" maxlength="50">
+		                    <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+		                        The name is required.
+		                    </div>
+		                </div>
+		            </div>
+		            <div class="row">
+		                <div class="col-sm-4 form-group"><label for="description">Description</label></div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="text" class="form-control" [(ngModel)]="alarm.description" id="description" name="description" ngControl="description" required
+		                           #description="ngModel" placeholder="Description (included in the emails sent)" maxlength="250">
+		                    <div [hidden]="description.valid || description.pristine" class="alert alert-danger">
+		                        The description is required.
+		                    </div>
+		                </div>
+		            </div>
+		            <div class="row">
+		                <div class="col-sm-4 form-group">
+		                    <label for="target">Alarm function (<em>target</em>) <a href="https://graphite.readthedocs.org/en/0.9.12/functions.html" target="_functions"><span class="glyphicon glyphicon-info-sign"></span></a></label>
+		                </div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="text" class="form-control" [(ngModel)]="alarm.target" id="target" name="target" ngControl="target" required #target="ngModel"
+                                   placeholder="Target/Graphite key. the function 'keepLastValue' will be automatically added if absent.">
+		                    <div [hidden]="target.valid || target.pristine" class="alert alert-danger">
+		                        The Graphite key or function is required.
+		                    </div>
+		                </div>
+		            </div>
+					<div class="row">
+						<div class="col-sm-4 form-group">
+							<label for="graphiteBaseUrl">Datasource</label>
+						</div>
+						<div class="col-sm-8 form-group">
+							<select class="form-control" [(ngModel)]="alarm.graphiteBaseUrl" name="graphiteBaseUrl" ngControl="graphiteBaseUrl">
+								<option *ngFor="let source of sources" [value]="source">{{source}}</option>
+							</select>
+						</div>
+					</div>
+
+		            <div class="row">
+		                <div class="col-sm-4 form-group"><label for="warn">Warning threshold</label></div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="alarm.warn" id="warn" name="warn" ngControl="warn" required #warn="ngModel"
+                                   placeholder="Warning threshold">
+		                    <div [hidden]="warn.valid || warn.pristine" class="alert alert-danger">
+		                        The warning threshold is required.
+		                    </div>
+		                </div>
+		            </div>
+		            <div class="row">
+		                <div class="col-sm-4 form-group"><label for="error">Error threshold</label></div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="alarm.error" id="error" name="error" ngControl="error" required #error="ngModel"
+                                   placeholder="Error threshold">
+		                    <div [hidden]="error.valid || error.pristine" class="alert alert-danger">
+		                        The error threshold is required.
+		                    </div>
+		                </div>
+		            </div>
+                <div class="row">
+                  <div class="col-sm-4 form-group"><label for="from">Sampling window</label></div>
+                  <div class="col-sm-4 form-group">
+                    <div >
+                      <div class="col-sm-3 form-group">From</div>
+                      <div  class="col-sm-6 form-group">
+                        <input type="text" min="-60" step="1" class="form-control" [(ngModel)]="alarm.from" id="from"  name="from"  required #error="ngModel"
+                               placeholder="-25min" tabindex="1">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-4 form-group">
+                    <div >
+                      <div class="col-sm-3 form-group">to</div>
+                      <div class="col-sm-6 form-group">
+                        <input type="text" min="-60" step="1" class="form-control" [(ngModel)]="alarm.until" name="until" required #error="ngModel"
+                               placeholder="-1min" tabindex="2">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+		            <div class="row">
+		                <div class="col-xs-10 col-sm-4 form-group"><label for="allowNoData">Allow no data?</label></div>
+		                <div class="col-xs-2 col-sm-8 form-group">
+		                    <input type="checkbox" class="form-control" [(ngModel)]="allowNoData" id="allowNoData" name="allowNoData" ngControl="allowNoData">
+		                </div>
+		            </div>
+		        </div>
+		        <br>
+
+
+		        <div class="modal-footer">
+		            <button type="submit" class="btn btn-default" [disabled]="!updateAlarmForm.form.valid">
+		                Next <span class="glyphicon glyphicon-step-forward" [class.text-success]="updateAlarmForm.form.valid"></span>
+		            </button>
+		        </div>
+		    </form>
+		</div>
+		<div [hidden]="!submitted">
+		    <div class="progress">
+		        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+		            <span class="sr-only">Step 2/2</span>
+		        </div>
+		    </div>
+		    <div class="well">
+		        <p>Check the modification previews, then finish to save the alarm.</p>
+		    </div>
+		    <h3>Parameters</h3>
+		    <div>
+		        <div class="row">
+		            <div class="col-xs-3">Name</div>
+		            <div class="col-xs-9  pull-left">{{ alarm.name }}</div>
+		        </div>
+		        <div class="row">
+		            <div class="col-xs-3">Description</div>
+		            <div class="col-xs-9 pull-left">{{ alarm.description }}</div>
+		        </div>
+		        <div class="row">
+		            <div class="col-xs-3">Alarm function (<em>target</em>) <a href="https://graphite.readthedocs.org/en/0.9.12/functions.html" target="_functions"><span class="glyphicon glyphicon-info-sign"></span></a></div>
+		            <div class="col-xs-9 pull-left"><kbd class="target">{{alarm.target}}</kbd></div>
+		        </div>
+		        <div class="row">
+		            <div class="col-xs-3">Thresholds (warning / error)</div>
+		            <div class="col-xs-9 pull-left"><span class="label label-warning" style="font-size: small">{{alarm.warn}}</span> / <span class="label label-danger" style="font-size: small">{{alarm.error}}</span></div>
+		        </div>
+		    </div>
+
+		    <h3>Previews</h3>
+		    <div class="row">
+		        <div class="col-lg-4">
+		            <a *ngIf="submitted" [href]="graphMaxiUrl('1h', 'Over 1 hour')" target="_overview"><img [src]="graphMiniUrl('1h', 'Over 1 hour')"></a>
+		        </div>
+		        <div class="col-lg-4">
+		            <a *ngIf="submitted" [href]="graphMaxiUrl('1d', 'Over 1 day')" target="_overview"><img [src]="graphMiniUrl('1d', 'Over 1 day')"></a>
+		        </div>
+		        <div class="col-lg-4">
+		            <a *ngIf="submitted" [href]="graphMaxiUrl('1w', 'Over 1 week')" target="_overview"><img [src]="graphMiniUrl('1w', 'Over 1 week')"></a>
+		        </div>
+		    </div>
+		    <br>
+
+		    <br>
+		    <div class="modal-footer">
+		        <button class="btn btn-default" (click)="submitted=false;">
+		            Back <span class="glyphicon glyphicon-step-backward text-danger"></span>
+		        </button>
+		        <button class="btn btn-default" data-dismiss="modal" (click)="saveAlarm();submitted=false;">
+		            <strong>Save</strong> <span class="glyphicon glyphicon-ok text-success"></span>
+		        </button>
+		    </div>
+		</div>
+    </modal-body>
+</modal>
+
+
+<button type="button" class="btn btn-default" (click)="updateAlarmModal.open()" title="Edit..." [disabled]="disabled">
+    <span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit...
+</button>

@@ -1,0 +1,94 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div *ngIf="!hidden">
+    <div class="well">
+        <p>Create an alarm on the last measured value, or aggregate value on a time range to get smoothed alerting functions and possibly
+            less variations/noise among alerts.</p>
+        <p>The next step will setup fixed thresholds or history comparisons.</p>
+    </div>
+    <div><img [src]="getIllustrationSrc()" class="img-responsive center-block" /></div>
+</div>
+
+<form (ngSubmit)="submit()" #step2Form="ngForm">
+  <h3>Sampling</h3>
+  <div class="row" [attr.data-step]="hidden ? null : 1" [attr.data-intro]="hidden ? null : introTexts[0]">
+    <div class="col-sm-6 form-group"><label for="from">Sampling window</label></div>
+    <div class="col-sm-3 form-group">
+      <div class="col-sm-1 form-group">From</div>
+      <div  class="col-sm-5 form-group">
+        <input  type="text" min="-60" step="1" class="form-control" [(ngModel)]="alarm.from" id="from" name="from" required #error="ngModel"
+        placeholder="-25min" tabindex="1">
+      </div>
+      </div>
+      <div class="col-sm-3 form-group">
+        <div class="col-sm-1 form-group">to</div>
+        <div class="col-sm-5 form-group">
+          <input  type="text" min="-60" step="1" class="form-control" [(ngModel)]="alarm.until" name="until" required #error="ngModel"
+          placeholder="-1" tabindex="2">
+        </div>
+      </div>
+    </div>
+    <h3>Data smoothing</h3>
+    <div [attr.data-step]="hidden ? null : 2" [attr.data-intro]="hidden ? null : introTexts[1]" data-position="top">
+        <div class="row">
+            <div class="col-sm-6 form-group">
+                <label for="windowMode">Time range</label>
+            </div>
+            <div class="col-sm-6 form-group">
+                <select class="form-control" [(ngModel)]="windowMode" id="windowMode" name="windowMode"(ngModelChange)="findSummarizeAgragation()" ngControl="windowMode" tabindex="3">
+                <!-- <select class="form-control" [(ngModel)]="windowMode" name="windowMode" ngControl="windowMode" tabindex="3"> -->
+                    <option *ngFor="let option of windowModes" [value]="option.id">{{option.label}} ({{option.id}})</option>
+                </select>
+            </div>
+        </div>
+        <div class="row" *ngIf="windowMode != 'keepLastValue'">
+            <div class="col-sm-6 form-group"><label for="windowAggregation">Value to compute</label></div>
+            <div class="col-sm-2 form-group">
+                <select class="form-control" [(ngModel)]="windowAggregation" id="windowAggregation" name="windowAggregation" ngControl="windowAggregation" tabindex="4">
+                    <option *ngFor="let option of windowAggregations" [value]="option.id">{{option.label}}</option>
+                </select>
+            </div>
+            <div class="col-sm-1 form-group">
+                <input type="number" class="form-control" [(ngModel)]="windowNumber" ngControl="windowNumber" (ngModelChange)="findSummarizeUnit()"
+                       placeholder="Number of units of time to be aggregated" tabindex="3" name="timeUnitsNumber" id="timeUnitsNumber">
+            </div>
+            <div class="col-sm-3 form-group">
+                <select class="form-control" [(ngModel)]="windowUnit" (ngModelChange)="findSummarizeUnit()" ngControl="windowUnit" tabindex="5" name="windowUnits" id="windowUnits">
+                    <option *ngFor="let option of windowUnits" [value]="option.id">{{option.label}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="well well-sm" *ngIf="windowMode != 'keepLastValue'">
+            <p>Examples :</p>
+            <ul>
+                <li>Select "sum one day" will compute the sum of all the values over the last 24 hours.</li>
+                <li>Select "average 2 weeks" compute the average of all the values over the last two weeks.</li>
+            </ul>
+        </div>
+    </div>
+    <br>
+    <button type="button" class="btn btn-default" (click)="goBack()" [attr.data-step]="hidden ? null : 3" [attr.data-intro]="hidden ? null : introTexts[2]" data-position="top">
+        Back <span class="glyphicon glyphicon-step-backward text-danger"></span>
+    </button>
+    <button type="button" class="btn btn-default" (click)="openPreview()" [attr.data-step]="hidden ? null : 4" [attr.data-intro]="hidden ? null : introTexts[3]" data-position="top">
+        <span class="glyphicon glyphicon-zoom-in text-info"></span> Preview...</button>
+    <button name="go-to-step-3" type="submit" class="btn btn-default" [disabled]="!step2Form.form.valid" tabindex="5" [attr.data-step]="hidden ? null : 5" [attr.data-intro]="hidden ? null : introTexts[4]" data-position="top">
+        Next <span class="glyphicon glyphicon-step-forward" [class.text-success]="step2Form.form.valid"></span>
+    </button>
+</form>

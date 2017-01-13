@@ -1,0 +1,127 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div *ngIf="!hidden">
+    <div class="well">
+        <p>Plan your notifications according to status, days and hours when you want to be alerted.</p>
+        <p>Other people will be able to subscribe to the same alarm and choose their own filters.</p>
+    </div>
+</div>
+<form (ngSubmit)="submit()" #step4Form="ngForm">
+    <h3>Subscription</h3>
+    <div>
+        <div class="row" [attr.data-step]="hidden ? null : 1"
+        [attr.data-intro]="hidden ?  null : introTexts[0]">
+            <div class="col-sm-6 form-group"><label for="target">Email address</label></div>
+            <div class="col-sm-6 form-group">
+                <div class="input-group">
+                    <span class="input-group-addon">@</span>
+                    <input type="email" class="form-control" [(ngModel)]="alarm.subscriptions[0].target" id="target" name="target"
+                           ngControl="subscriptionTarget" required #subscriptionTarget="ngModel"
+                           placeholder="E-mail address (unique) to send changes" tabindex="1">
+                </div>
+                <div [hidden]="subscriptionTarget.valid || subscriptionTarget.pristine" class="alert alert-danger">
+                    The email address.
+                </div>
+            </div>
+        </div>
+        <div class="row" [attr.data-step]="hidden ? null : 2"
+             [attr.data-intro]="hidden ?  null : introTexts[1]">
+            <div class="col-lg-6 form-group"><label>Notifications for selected status</label></div>
+            <div class="col-lg-6 form-group">
+                <div class="btn-group" data-toggle="buttons">
+                    <button type="button" data-toggle="button" (click)="switchIgnoreStatus('ignoreWarn')"
+                            [class]="isIgnoreStatus('ignoreWarn') ? 'btn toggle-status btn-default' : 'btn toggle-status btn-warning active'" tabindex="2">
+                        WARN <span class="label label-warning"><span *ngIf="isIgnoreStatus('ignoreWarn')">&nbsp;&nbsp;&nbsp;</span>
+                    <span *ngIf="!isIgnoreStatus('ignoreWarn')" class="glyphicon glyphicon-bell"></span></span>
+                    </button>
+                    <button type="button" data-toggle="button" (click)="switchIgnoreStatus('ignoreError')"
+                            [class]="isIgnoreStatus('ignoreError') ? 'btn toggle-status btn-default' : 'btn toggle-status btn-danger active'" tabindex="3">
+                        ERROR <span class="label label-danger"><span *ngIf="isIgnoreStatus('ignoreError')">&nbsp;&nbsp;&nbsp;</span>
+                    <span *ngIf="!isIgnoreStatus('ignoreError')" class="glyphicon glyphicon-bell"></span></span>
+                    </button>
+                    <button type="button" data-toggle="button" (click)="switchIgnoreStatus('ignoreOk')"
+                            [class]="isIgnoreStatus('ignoreOk') ? 'btn toggle-status btn-default' : 'btn toggle-status btn-success active'" tabindex="4">
+                        OK <span class="label label-success"><span *ngIf="isIgnoreStatus('ignoreOk')">&nbsp;&nbsp;&nbsp;</span>
+                    <span *ngIf="!isIgnoreStatus('ignoreOk')" class="glyphicon glyphicon-bell"></span></span>
+                    </button>
+                    <button type="button" data-toggle="button" (click)="switchIgnoreStatus('ignoreUnknown')"
+                            [class]="isIgnoreStatus('ignoreUnknown') ? 'btn toggle-status btn-default' : 'btn toggle-status btn-default active'" tabindex="5">
+                        UNKNOWN <span class="label label-default"><span *ngIf="isIgnoreStatus('ignoreUnknown')">&nbsp;&nbsp;&nbsp;</span>
+                    <span *ngIf="!isIgnoreStatus('ignoreUnknown')" class="glyphicon glyphicon-bell"></span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="well">
+            <p>By default, the notifications are sent when the alarm status changes. (If the alarm keeps the same status,
+                even <em>ERROR</em>, it does not send a new notification.)</p>
+            <p>You can choose to disable the notifications for a given status, for example : be notified only if the new status is <em>ERROR</em>
+                but not when it is back to normal.</p>
+        </div>
+        <div class="row" [attr.data-step]="hidden ? null : 3"
+        [attr.data-intro]="hidden ? null : introTexts[2]">
+            <div class="col-lg-4 form-group"><label>Days when notifications will be active</label></div>
+            <div class="col-lg-8 form-group alarm_days-selector">
+                <div class="btn-group" data-toggle="buttons">
+                    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('mo')" (click)="switchActive('mo')" tabindex="6">Monday</button>
+                    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('tu')" (click)="switchActive('tu')" tabindex="7">Tuesday</button>
+                    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('we')" (click)="switchActive('we')" tabindex="8">Wednesday</button>
+                    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('th')" (click)="switchActive('th')" tabindex="9">Thursday</button>
+                    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('fr')" (click)="switchActive('fr')" tabindex="10">Friday</button>
+                    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('sa')" (click)="switchActive('sa')" tabindex="11">Saturday</button>
+                    <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('su')" (click)="switchActive('su')" tabindex="12">Sunday</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" [attr.data-step]="hidden ? null : 4"
+        [attr.data-intro]="hidden ? null : introTexts[3]">
+            <div class="col-sm-6 form-group"><label >Notifications will be active from {{this.alarm.subscriptions[0].fromTime | subscriptionTimeFormat}} to {{this.alarm.subscriptions[0].toTime | subscriptionTimeFormat}}</label></div>
+            <div class="col-sm-6 form-group">
+                <nouislider name="subTime" [config]="defaultSliderConfig" [(ngModel)]="someRange2" (ngModelChange)="onSliderChange($event)"></nouislider>
+            </div>
+        </div>
+
+    </div>
+    <br>
+
+    <!--<div class="form-group">-->
+    <!--<label for="subscriptions">subscriptions</label>-->
+    <!--<input type="text" class="form-control" [(ngModel)]="newCheck.subscriptions" ngControl="subscriptions">-->
+    <!--</div>-->
+    <!--<div class="form-group">-->
+    <!--<label for="subscriptionTarget">Adresse email</label>-->
+    <!--<input type="text" class="form-control" [(ngModel)]="newCheck.subscriptions[0].target" ngControl="subscriptionTarget" required #subscriptionTarget="ngModel">-->
+    <!--<div [hidden]="subscriptionTarget.valid || subscriptionTarget.pristine" class="alert alert-danger">-->
+    <!--L'adresse email est requise.-->
+    <!--</div>-->
+    <!--</div>-->
+    <br>
+    <button type="button" class="btn btn-default" (click)="goBack()" [attr.data-step]="hidden ? null : 5"
+    [attr.data-intro]="hidden ? null : introTexts[4]" data-position="top">
+        Back <span class="glyphicon glyphicon-step-backward text-danger"></span>
+    </button>
+    <button type="button" class="btn btn-default" (click)="openPreview()" [attr.data-step]="hidden ? null : 6"
+    [attr.data-intro]="hidden ? null : introTexts[5]"data-position="top">
+        <span class="glyphicon glyphicon-zoom-in text-info"></span> Preview...</button>
+    <button id="go-to-step-5" type="submit" class="btn btn-default" [disabled]="!step4Form.form.valid" tabindex="13" [attr.data-step]="hidden ? null : 7"
+    [attr.data-intro]="hidden ? null : introTexts[6]" data-position="top">
+        Next <span class="glyphicon glyphicon-step-forward" [class.text-success]="step4Form.form.valid"></span>
+    </button>
+</form>

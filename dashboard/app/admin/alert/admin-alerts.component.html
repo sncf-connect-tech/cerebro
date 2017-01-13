@@ -1,0 +1,82 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="container">
+  <div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+  <h1>Alerts stat</h1>
+  <div class="row cardAdmin">
+    <div class="col-md-4">
+      <div class="panel panel-blue panel-stat">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-2">
+              <span class="glyphicon glyphicon-refresh stats_icon"></span>
+            </div>
+            <div class="col-xs-10 text-right">
+              <div>
+                <h3 *ngIf="!alertWithChangeSince2Hour"><span class="glyphicon glyphicon-refresh loading"></span> Loading</h3>
+                <h3 *ngIf="alertWithChangeSince2Hour">{{totalAlertFilteredImport}}</h3>
+              </div>
+              <div>Status changes since 2h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-green panel-stat">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-2">
+              <span class="glyphicon glyphicon-off stats_icon"></span>
+            </div>
+            <div class="col-xs-10 text-right">
+              <div>
+                <h3 *ngIf="!alertWithoutChangeSince3Day"><span class="glyphicon glyphicon-refresh loading"></span> Loading</h3>
+                <h3 *ngIf="alertWithoutChangeSince3Day">{{alertWithoutChangeSince3Day.length}} alarm(s)</h3>
+              </div>
+              <div>Alarms with no changes since 3d</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-yellow panel-stat">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-2">
+              <span class="glyphicon glyphicon-road stats_icon"></span>
+            </div>
+            <div class="col-xs-10 text-right">
+              <div>
+                <h3 *ngIf="!alertWithFiveChangeSince2Hour"><span class="glyphicon glyphicon-refresh loading"></span> Loading</h3>
+                <h3 *ngIf="alertWithFiveChangeSince2Hour">{{alertWithFiveChangeSince2Hour.length}} alarm(s)</h3>
+              </div>
+              <div>Alarms with 5 changes or + since 2h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <modal-stats-alarm-simple [title]="'Alarms with alerts since 2h'"     [alarmNames]="alarmNames" [stats]="alertWithChangeSince2Hour"></modal-stats-alarm-simple>
+  <modal-stats-alarm-simple [title]="'Alarms without alerts since 5 days'"    [alarmNames]="alarmNames" [stats]="alertWithoutChangeSince3Day"></modal-stats-alarm-simple>
+  <modal-stats-alarm-simple [title]="'Alarms with 5 alerts or more since 2h'" [alarmNames]="alarmNames" [stats]="alertWithFiveChangeSince2Hour"></modal-stats-alarm-simple>
+</div>

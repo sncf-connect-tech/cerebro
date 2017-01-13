@@ -1,0 +1,37 @@
+{
+  "id": "goodCheck",
+  "name": "Good check",
+  "description": "A good check for tests",
+  "target": "keepLastValue(target.fake)",
+  "from": "-25min",
+  "until": "-1min",
+  "graphiteBaseUrl": "http://toto/",
+  "warn": "1310",
+  "error": "1524",
+  "enabled": false,
+  "live": false,
+  "allowNoData": true,
+  "state": "WARN",
+  "lastCheck": 1468408054468,
+  "subscriptions": [
+    {
+      "id": "goodSub",
+      "target": "sub@test.com",
+      "type": "EMAIL",
+      "su": false,
+      "mo": true,
+      "tu": true,
+      "we": true,
+      "th": true,
+      "fr": true,
+      "sa": false,
+      "ignoreWarn": true,
+      "ignoreError": false,
+      "ignoreOk": false,
+      "ignoreUnknown": true,
+      "fromTime": "1030",
+      "toTime": "1800",
+      "enabled": true
+    }
+  ]
+}

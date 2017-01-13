@@ -1,0 +1,52 @@
+/*
+ * This file is part of the Cerebro distribution.
+ * (https://github.com/voyages-sncf-technologies/cerebro)
+ * Copyright (C) 2017 VSCT.
+ *
+ * Cerebro is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, version 3 of the License.
+ *
+ * Cerebro is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+.panel-stat {
+    min-height: 102px;
+}
+
+.panel-green {
+  background-color: #16a085;
+  color:white;
+}
+.panel-yellow {
+  background-color: #f1c40f;
+  color:white;
+}
+
+.panel-red {
+  background-color: #9b59b6;
+  color:white;
+}
+
+.panel-blue {
+  background-color: #3498db;
+  color:white;
+}
+
+.stats_icon {
+  font-size: 3em;
+}
+
+.circle {
+  border-radius: 50%;
+  background-color: #9b59b6;
+  margin: 0 auto;
+
+}

@@ -1,0 +1,12 @@
+//official keycloak web site http://www.keycloak.org/
+//keycloak demo app https://github.com/keycloak/keycloak/tree/master/examples/demo-template/angular2-product-app
+{
+  "realm": "YOUR_REALM",
+  "realm-public-key": "YOUR_REALM_PUBLIC_KEY",
+  "auth-server-url": "YOUR_AUTH_SERVER_URL",
+  "ssl-required": "external",
+  "resource": "cerebro-dashboard-dev",
+  "credentials": {
+    "secret": "YOUR_SECRET"
+  }
+}

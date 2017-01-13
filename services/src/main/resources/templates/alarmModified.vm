@@ -1,0 +1,12 @@
+<html>
+<body>
+<h3>One of your alerts has been ${status}:</h3>
+<p>
+	Your "<a href="${link}">${alert}</a>" alert on Cerebro has just been ${status}.
+	</p>
+<p>
+    Do not hesitate to go to the alert page to see the changes.
+</p>
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div *ngIf="!hidden">
+    <div class="well">
+        <p>Instead of comparing the current value (smoothed or not) to fixed thresholds, you can create an alarm on the variations
+            taking into account the data historic.</p>
+        <p>Note : actually nothing prevents from creating several alarms, to combine fixed threshold and variation thresholds.</p>
+    </div>
+    <div><img [src]="getIllustrationSrc()" class="img-responsive center-block" /></div>
+</div>
+
+<form (ngSubmit)="submit()" #step3Form="ngForm">
+    <h3>Comparison</h3>
+    <div>
+        <div class="row" [attr.data-step]="hidden ? null : 1" [attr.data-intro]="hidden ? null : introTexts[0]">
+            <div class="col-sm-6 form-group">
+                <label for="thresholdMode">Comparison mode</label>
+            </div>
+            <div class="col-sm-6 form-group">
+                <select class="form-control" [(ngModel)]="thresholdMode" id="thresholdMode" name="thresholdMode" ngControl="thresholdMode" tabindex="1">
+                    <option *ngFor="let option of thresholdModes" [value]="option.id">{{option.label}}</option>
+                </select>
+            </div>
+        </div>
+        <div *ngIf="thresholdMode != 'static'">
+
+          <h3>History comparison</h3>
+
+          <div class="row" [attr.data-step]="hidden || thresholdMode == static ? null : 2" [attr.data-intro]="hidden || thresholdMode == static ? null : introTexts[1]">
+            <div class="col-sm-6 form-group"><label for="analysisMode">Search...</label></div>
+            <div class="col-sm-6 form-group">
+              <select class="form-control" [(ngModel)]="analysisMode" id="analysisMode" name="analysisMode" ngControl="analysisMode" tabindex="2">
+                <option *ngFor="let option of analysisModes" [value]="option.id">{{option.label}}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Only for summarize mode -->
+          <div class="row" *ngIf="analysisMode == 'summarize'">
+            <div class="col-sm-6 form-group"><label for="summarizeMode"></label></div>
+            <div class="col-sm-2 form-group">
+                <select class="form-control" [(ngModel)]="summarizeMode" id="summarizeMode" name="summarizeMode" ngControl="summarizeMode" tabindex="3">
+                    <option *ngFor="let option of summarizeModes" [value]="option.id">{{option.label}}</option>
+                </select>
+            </div>
+            <div class="col-sm-1 form-group">
+              <input type="number" class="form-control" [(ngModel)]="summarizeInterval" name="summarizeInterval" ngControl="summarizeInterval"
+                placeholder="Number of time units to compared/aggregated" tabindex="4">
+            </div>
+            <div class="col-sm-2 form-group">
+              <select class="form-control" [(ngModel)]="summarizeUnit" name="summarizeUnit" ngControl="summarizeUnit" tabindex="5">
+                <option *ngFor="let option of summarizeUnits" [value]="option.id">{{option.label}}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- always here -->
+          <div class="row" [attr.data-step]="hidden || thresholdMode == static ? null : 3"
+          [attr.data-intro]="hidden || thresholdMode == static ? null : introTexts[2]">
+            <div class="col-sm-6 form-group"><label for="timeshiftNumber">Iterate...</label></div>
+                  <div class="col-sm-1 form-group">
+                <input type="number" class="form-control" [(ngModel)]="timeshiftNumber" id="timeshiftNumber" name="timeshiftNumber" ngControl="timeshiftNumber"
+                       placeholder="Number of time units to compare/aggregate" tabindex="6">
+            </div>
+            <div class="col-sm-2 form-control-static"> times, shifting of </div>
+            <div class="col-sm-3 form-group">
+                <select class="form-control" [(ngModel)]="timeshiftUnit" name="timeshiftUnit" ngControl="timeshiftUnit" tabindex="7">
+                    <option *ngFor="let option of timeshiftUnits" [value]="option.id">{{option.label}}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row" *ngIf="timeshiftNumber > 1">
+          <div class="col-sm-6 form-group">
+            <label for="thresholdMode"></label>
+          </div>
+          <div class="col-sm-2 form-control-static">while keeping</div>
+          <div class="col-sm-2 form-group">
+            <select class="form-control" [(ngModel)]="timeshiftAggregation" name="timeshiftAggregation" ngControl="timeshiftAggregation" tabindex="8">
+              <option *ngFor="let option of timeshiftAggregations" [value]="option.id">{{option.label}}</option>
+            </select>
+          </div>
+          <div class="col-sm-2 form-control-static">of iterations</div>
+        </div>
+
+        <div class="alert alert-warning" role="alert" *ngIf="timeshiftUnit == 'mon' || summarizeUnit == 'mon'">
+            <p><strong>Warning, about "month"</strong> : for Graphite, 1 month = 30 days (it does not use the regular calendar).</p>
+        </div>
+        <div class="well well-sm" *ngIf="thresholdMode != 'static'">
+            <p>Notes :</p>
+            <ul>
+                <li>Shift of "1 week" does not mean that all the week values will be analysed, but only the value from one week <strong>ago</strong> (same day same hour).</li>
+                <li>Even if you choose several iterations, a unique final value must be kept to be compared to the current data.</li>
+            </ul>
+        </div>
+        <div class="row" *ngIf="thresholdMode != 'static'" [attr.data-step]="hidden || thresholdMode == static ? null : 4"
+        [attr.data-intro]="hidden || thresholdMode == static ? null : introTexts[3]">
+            <div class="col-sm-6 form-group">
+                <label for="thresholdMode">Set thresholds as</label>
+            </div>
+            <div class="col-sm-6 form-group">
+                <select class="form-control" [(ngModel)]="compareMethod" name="compareMethod" ngControl="compareMethod" tabindex="9">
+                    <option *ngFor="let option of compareMethods" [value]="option.id">{{option.label}} ({{option.id}})</option>
+                </select>
+             </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Thresholds</h3>
+    <div>
+        <div class="row" [attr.data-step]="hidden ? null : 5"
+        [attr.data-intro]="hidden ? null : introTexts[4]">
+            <div class="col-sm-6 form-group"><label for="warn-threshold">Warning threshold</label></div>
+            <div class="col-sm-6 form-group">
+                <div [class.input-group]="isPercent()">
+                    <span class="input-group-addon" *ngIf="isPercent()">%</span>
+                    <input id="warn-threshold" name="warn-threshold" type="number" min="0" step="0.01" class="form-control" [(ngModel)]="alarm.warn" ngControl="warn" required #warn="ngModel"
+                           placeholder="Warning threshold" tabindex="10">
+                </div>
+                <div [hidden]="warn.valid || warn.pristine" class="alert alert-danger">
+                    The warning threshold is required.
+                </div>
+            </div>
+        </div>
+        <div class="row" [attr.data-step]="hidden ? null : 6"
+        [attr.data-intro]="hidden ? null : introTexts[5]">
+            <div class="col-sm-6 form-group"><label for="error-threshold">Error threshold</label></div>
+            <div class="col-sm-6 form-group">
+                <div [class.input-group]="isPercent()">
+                    <span class="input-group-addon" *ngIf="isPercent()">%</span>
+                    <input id="error-threshold" name="error-threshold" type="number" min="0" step="0.01" class="form-control" [(ngModel)]="alarm.error" ngControl="error" required #error="ngModel"
+                           placeholder="Error threshold" tabindex="11">
+                </div>
+                <div [hidden]="error.valid || error.pristine" class="alert alert-danger">
+                    The error threshold is required.
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-10 col-sm-6 form-group"><label for="allowNoData">Allow no data ?</label></div>
+            <div class="col-xs-2 col-sm-6 form-group">
+                <input type="checkbox" class="form-control" [(ngModel)]="allowNoData" ngControl="allowNoData" id="allowNoData" name="allowNoData" tabindex="12">
+            </div>
+        </div>
+
+        <div class="well well-sm">
+            <span class="glyphicon glyphicon-warning-sign"></span>
+            <ul>
+                <li>If the checkbox <strong>Allow no data?</strong> is checked : when there is no data, the alarm status changes to <span class="label label-success">OK</span>. No available data is considered normal</li>
+                <li>If the checkbox <strong>Allow no data?</strong> is not checked : when there is no data, the alarm status changes to <span class="label label-default">UNKNOWN</span>. You will received a notification that the status is now unknown</li>
+            </ul>
+       	</div>
+        <div class="row" [attr.data-step]="hidden ? null : 7"
+        [attr.data-intro]="hidden ? null : introTexts[6]" data-position="top">
+            <div class="col-xs-10 col-sm-6 form-group">
+                <label for="windowNullAsZero">Returns 0 if no data is available
+                    <a href="https://graphite.readthedocs.io/en/0.9.10/functions.html#graphite.render.functions.transformNull" target="_functions">
+                        <span class="glyphicon glyphicon-info-sign"></span></a></label>
+            </div>
+            <div class="col-xs-2 col-sm-6 form-group">
+                <input type="checkbox" class="form-control" id="windowNullAsZero" [(ngModel)]="windowNullAsZero" name="windowNullAsZero" ngControl="windowNullAsZero">
+            </div>
+        </div>
+    </div>
+    <br>
+    <button type="button" class="btn btn-default" (click)="goBack()" [attr.data-step]="hidden ? null : 8"
+    [attr.data-intro]="hidden ? null : introTexts[7]" data-position="top">
+        Back <span class="glyphicon glyphicon-step-backward text-danger"></span>
+    </button>
+    <button type="button" class="btn btn-default" (click)="openPreview()" [attr.data-step]="hidden ? null : 9"
+            [attr.data-intro]="hidden ? null : introTexts[8]" data-position="top">
+        <span class="glyphicon glyphicon-zoom-in text-info"></span> Preview...</button>
+    <button id="go-to-step-4" type="submit" class="btn btn-default" [disabled]="!step3Form.form.valid" tabindex="13" [attr.data-step]="hidden ? null : 10"
+            [attr.data-intro]="hidden ? null : introTexts[9]" data-position="top">
+        Next <span class="glyphicon glyphicon-step-forward" [class.text-success]="step3Form.form.valid"></span>
+    </button>
+</form>

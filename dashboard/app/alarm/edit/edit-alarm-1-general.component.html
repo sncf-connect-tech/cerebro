@@ -1,0 +1,82 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div *ngIf="!hidden">
+    <div class="well">
+        <p>First, describe the alarm and set the metrics to be watched (ie. the Graphite <em>target</em>).
+        <p>Next steps will give you the possibility to smooth data with time ranges, set thresholds and plan notifications.</p>
+    </div>
+</div>
+<form (ngSubmit)="submit()" #step1Form="ngForm">
+    <h3>What is it?</h3>
+    <div>
+        <div class="row" [attr.data-step]="hidden ? null : 1" [attr.data-intro]="hidden ? null : introTexts[0]">
+            <div class="col-sm-6 form-group" ><label for="name">Name</label></div>
+            <div class="col-sm-6 form-group">
+                <input id="name" name="name" type="text" class="form-control" [(ngModel)]="alarm.name" ngControl="name" required #name="ngModel"
+                       placeholder="Name (included in notification title)" maxlength="50" tabindex="1">
+                <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+                    The name is required
+                </div>
+            </div>
+        </div>
+        <div class="row" [attr.data-step]="hidden ? null : 2" [attr.data-intro]="hidden ? null : introTexts[1]">
+            <div class="col-sm-6 form-group"><label for="description">Description</label></div>
+            <div class="col-sm-6 form-group">
+                <input id="description" name="description" type="text" class="form-control" [(ngModel)]="alarm.description" ngControl="description" required
+                       #description="ngModel" placeholder="Description (included in notification body)" maxlength="250" tabindex="2">
+                <div [hidden]="description.valid || description.pristine" class="alert alert-danger">
+                    The description is required.
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3>Data</h3>
+    <div>
+        <div class="row" [attr.data-step]="hidden ? null : 3" [attr.data-intro]="hidden ? null : introTexts[2]">
+            <div class="col-sm-6 form-group">
+                <label for="graphite-key">Graphite <em>target</em> <a
+                        href="https://graphite.readthedocs.org/en/0.9.12/functions.html" target="_functions"><span
+                        class="glyphicon glyphicon-info-sign" [attr.data-step]="hidden ? null : 4" [attr.data-intro]="hidden ? null : introTexts[3]"></span></a></label>
+            </div>
+            <div class="col-sm-6 form-group">
+                <input id="graphite-key" name="graphite-key" type="text" class="form-control" [(ngModel)]="alarm.target" ngControl="target" required #target="ngModel"
+                       placeholder="Target/Graphite key" tabindex="3">
+                <div [hidden]="target.valid || target.pristine" class="alert alert-danger">
+                    The Graphite key is required.
+                </div>
+            </div>
+        </div>
+        <div class="row" [attr.data-step]="hidden ? null : 6" [attr.data-intro]="hidden ? null : introTexts[4]" data-position="top">
+            <div class="col-sm-6 form-group">
+                <label for="graphiteBaseUrl">Datasource</label>
+            </div>
+            <div class="col-sm-6 form-group">
+                <select class="form-control" [(ngModel)]="alarm.graphiteBaseUrl" ngControl="graphiteBaseUrl" name="source" tabindex="4">
+                    <option *ngFor="let source of sources" [value]="source">{{source}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <br>
+    <button type="button" class="btn btn-default" [disabled]="!step1Form.form.valid" (click)="openPreview()" [attr.data-step]="hidden ? null : 7" [attr.data-intro]="hidden ? null : introTexts[5]" data-position="top">
+        <span class="glyphicon glyphicon-zoom-in text-info"></span> Preview...</button>
+    <button name="go-to-step-2" type="submit" class="btn btn-default" [disabled]="!step1Form.form.valid" tabindex="5" [attr.data-step]="hidden ? null : 8" [attr.data-intro]="hidden ? null : introTexts[6]" data-position="top">
+        Next <span class="glyphicon glyphicon-step-forward" [class.text-success]="step1Form.form.valid"></span>
+    </button>
+</form>

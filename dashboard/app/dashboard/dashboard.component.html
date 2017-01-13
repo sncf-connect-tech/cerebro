@@ -1,0 +1,63 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+<h2>My alarms</h2>
+
+<div class="panel-group alarms" id="accordion" role="tablist" aria-multiselectable="true" data-step="1" data-intro="Browse through your alarms. Click on an alarm to see its details">
+    <div class="alert alert-success" *ngIf="alarms == null || alarms.length == 0" role="alert">
+        No alarm found
+    </div>
+    <div *ngFor="let alarm of alarms" class="panel panel-default panel-sup-alarms panel-default-sup-alarms">
+        <div name="alarm-row" class="panel-heading panel-heading-sup-alarms" role="tab" data-toggle="collapse" data-parent="#accordion"
+            aria-expanded="false" attr.data-target="#detail{{alarm.id}}">
+            <span *ngIf="!alarm.enabled" class="label label-default">Disabled</span>
+            <alarm-status *ngIf="alarm.enabled" [status]="alarm.state"></alarm-status>
+            {{alarm.name}} <span class="pull-right">Subscribers : <span class="badge">{{alarm.subscriptions.length}}</span></span>
+        </div>
+        <div [id]="'detail' + alarm.id" class="panel-collapse collapse" role="tabpanel" aria-expanded="false">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-3 detailTitle">Description</div>
+                    <div class="col-xs-9 pull-left">{{alarm.description}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-3 detailTitle">Target (function / Graphite Key)</div>
+                    <div class="col-xs-9 pull-left">
+                        <kbd class="target">{{alarm.target}}</kbd>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-3 detailTitle">Thresholds (warning / error)</div>
+                    <div class="col-xs-9 pull-left">
+                        <span class="label label-warning" style="font-size: small">{{alarm.warn}}</span> / <span
+                            class="label label-danger" style="font-size: small">{{alarm.error}}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12" style="padding-top: 10px">
+                        <button id="dashboard-details-alarm" (click)="gotoDetail(alarm.id)" data-dismiss="modal" class="btn btn-default">
+                            <span class="glyphicon glyphicon-zoom-in"></span> Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,16 @@
+{  
+   "id":"576bb0cc0cf25814181a2ffb",
+   "name":"Bad Request",
+   "description":"Seyren response to bad request",
+   "target":null,
+   "from":"-25min",
+   "until":"-1min",
+   "graphiteBaseUrl":null,
+   "warn":null,
+   "error":null,
+   "enabled":true,
+   "live":false,
+   "allowNoData":true,
+   "state":"OK",
+   "lastCheck":1467041095.011
+}

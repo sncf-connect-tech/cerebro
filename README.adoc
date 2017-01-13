@@ -1,0 +1,122 @@
+= *Cerebro: open alerting for DevOps teams*
+Cerebro Team <cerebro-team(at)framalistes.org>
+v0.5.0, 13 jan 2017
+:encoding: UTF-8
+:toc: macro
+
+toc::[4]
+
+
+image:https://framapic.org/D8lOQIavuK0S/nRwzjvIC5c6u.png[cerebro-historymode,256,256]
+image:https://framapic.org/0yAgvuU4HkYK/Aw8XuAcwFdgh.png[cerebro-previews,256,230]
+image:https://framapic.org/eMIqg5EDk73P/IHCQfK3mMNRH.png[cerebro-alarms,256,200]
+image:https://framapic.org/UY9hON6gChm8/xYWo8zyWwGoX.png[cerebro-subscriptions,256,180]
+
+https://framapic.org/gallery#D8lOQIavuK0S/nRwzjvIC5c6u.png,0yAgvuU4HkYK/Aw8XuAcwFdgh.png,eMIqg5EDk73P/IHCQfK3mMNRH.png,UY9hON6gChm8/xYWo8zyWwGoX.png[(open screenshots)]
+
+== Cerebro
+
+Cerebro is an open alerting system over http://graphiteapp.org/[Graphite], the opensource timeseries database. The service layer currently integrates with https://github.com/scobal/seyren[Seyren] to store alarms, schedule checks and send alerts. (More backends in the future.)
+
+Cerebro provides a service layer (REST API) and a dashboard (Web UI) to make alerting over various types of metrics more accessible to Graphite non-experts. It is dedicated to DevOps teams monitoring their product/services.
+
+_Whereas still a beta, we already use Cerebro over various types of production metrics: system, applicative, business. We have teams and users, from ops to developers as well as product owners, which find it useful as a general-purpose open alerting service. That is why we chose to share Cerebro with the community, even though there is (much) place for improvements: scalability, resilience, API, integrations..._
+
+== Features
+
+* Supports alarms over http://graphiteapp.org/[Graphite] timeseries and email alerts for now. (More backends and alert types in the future.)
+* Use wizard-like forms to create basic, as well as advanced alarms:
+** Define basic fixed-thresholds alarms, as well as history-leveraging _targets_ (combining Graphite functions, such as `summarize` or `timeShift`)
+** Follow natural-language instructions and illustrations to set alarm modes and options
+** Preview data and thresholds results at each step (over 1h, 1d, 1w)
+* Browse, inspect, susbscribe to existing alarms:
+** Find / browse alarms and recent alerts
+** Subscribe/Unsubscribe to any alarm (setting active status/weekdays/hours of notifications)
+** Inspect alarm details, previews, subscribers
+* Edit alarms and subscriptions in a non-blocking manner:
+** Enable/Disable, edit or duplicate existing alarms (no owner - subscribers will be notified instead)
+** Enable/Disable, edit and delete subscriptions (when no subscription remains, the alarm is deleted to)
+* Leverage the REST API for programmatic usage (deploy alarms automatically with applications?)
+* Browse basic stats over alarms, alerts and subscribers
+* Get online help, links, info:
+** Contextual help from every page (_Prof. Xavier_)
+** Customizable links to your wiki, chatroom, issues, mailing list...
+** Technical details about the version (commit, author, build job, etc.)
+** API online documentation (with http://swagger.io/swagger-ui/[Swagger UI])
+
+NOTE: Questions about existing/missing features and supports? auth? alarm ownership?... Please check the FAQ wiki.
+
+== Getting started
+
+The following instructions show how to create an alarm with Cerebro, as well as several other features, running everything locally as https://www.docker.com/[Docker] containers.
+
+* Install https://maven.apache.org/[Maven] and https://docs.docker.com/compose/[Docker Compose].
+
+* Build Cerebro:
+
+    $ mvn clean verify
+
+* Run Cerebro over fresh Graphite+Seyren backends as containers:
+
+    $ cd docker
+    $ docker-compose up
+
+* Open the Cerebro dashboard on http://localhost (IP may be different for Docker Toolbox users).
+* Once the dashboard is loaded, click on the _Prof. Xavier_ button to get a short description of what you see. Click on _Learn more..._ to get more info and a bunch of external links.
+
+* Create your first alarm:
+** Open _Create an alarm..._,
+** Enter some title and description,
+** Set the Graphite _target_, for instance `carbon.agents.*.cpuUsage`, then check the _Preview..._ to verify there actually are values in the backend,
+** In _Next_ step, select a _Time range (summarize)_ function, such as the _Average_ value over the last hour,
+** In _Next_ step, set some _Fixed thresholds_ values for warnings/errors, then check the _Preview..._ to see the results of smoothing and thresholds,
+** In _Next_ steps, configure email notifications (who, what, when), check the summary then _Finish_ saving the alarm.
+
+* From the alarm page, scroll to _Subscribers_ then _Subscribe..._ another email with different notification params, try disabling or editing a subscription (the buttons on the cards) or the alarm itself.
+
+* When back to the _All alarms_ page, verify your first alarm is visible. Click it to go back to details.
+
+* Cerebro Docker containers won't actually send emails (no SMTP configured), but congratulations: you've just created your first alarm and subscriptions with Cerebro.
+
+== User documentation
+
+In addition to comments and labels in the user interface, the dashboard _Prof. Xavier_ button provides contextual information from for every page.
+
+More user documentation will come soon.
+
+== Installation / Configuration
+
+See the link:INSTALL.adoc[INSTALL.adoc] file for installation and configuration instructions, as well as general information about dependencies, integrations, etc.
+
+== Code structure
+
+* `dashboard` : graphical user interface, running https://angular.io/[Angular 2] (https://www.typescriptlang.org/[TypeScript], http://getbootstrap.com/[Bootstrap], etc.)
+* `docker` : https://www.docker.com/[Docker] / https://docs.docker.com/compose/[Compose] implementation to run a Graphite+Mongo+Seyren+Cerebro stack of containers
+* `selenium` : http://www.seleniumhq.org/[Selenium] integration tests over dashboard features
+* `services` : REST API over backends, running https://spring.io/[Spring] / https://www.oracle.com/java/index.html[Java]
+
+== License
+
+See the link:LICENSE[LICENSE] file.
+
+NOTE:: Cerebro sources include several links to external images from the X-Men licence/movies. Those images are not part of Cerebro sources, only their URL is embedded, merely illustrating a possible look'n'feel for the application. Please see the link:INSTALL.adoc[configuration instructions] to replace them with other resources.
+
+== Frequently Asked Questions
+
+_Why Seyren? Angular 2? Why not <insert_your_language>?_
+
+_Get auth? Why no ownership over alarms?_
+
+_Does it scale? Can I use the beta in production?_
+
+_Where is the commit history? Who are you? Where do you want to go with Cerebro?_
+
+Please check the project wiki for FAQ.
+
+== Contact
+
+For most developers in the team, this is the first project we share to the community.
+
+We would be glad to have your feedback.
+
+_mailto:cerebro-team(at)framalistes.org_.

@@ -1,0 +1,125 @@
+ <!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div id="custom-search-input" data-step="1" data-intro="Search for alarms by name">
+     <div class="input-group col-md-12">
+         <input type="text" class="search-query form-control" placeholder="Search"
+             id="filterBarText" (ngModelChange)='onFilterChanged($event)' [ngModel]='listFilter' />
+         <span class="input-group-btn">
+             <button name="search-in-all-alarms" class="btn btn-danger" type="button" >
+                 <span class=" glyphicon glyphicon-search"></span>
+             </button>
+         </span>
+     </div>
+ </div>
+
+<div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+<h2>All alarms</h2>
+<label for="showDisableCheck">Display disabled alarms</label>
+<input id="showDisableCheck" [(ngModel)]="showDisabledAlarms" type="checkbox">
+<div class="text-center" style="font-size: 14px" data-step="2" data-intro="Browse through all the alarms page by page">
+    <div class="alert alert-info text-left" *ngIf="alarmsFiltered == null || alarmsFiltered.length == 0" role="alert">
+        No alarm found.
+    </div>
+    <pagination-template #pagination="paginationApi" [id]="config.id" (pageChange)="config.currentPage = $event" *ngIf="alarmsFiltered != null && alarmsFiltered.length > 0">
+        <div class="custom-pagination">
+            <span class="previous" [class.disabled]="pagination.isFirstPage()" (click)="pagination.previous()">
+                « Previous
+            </span>
+
+            <span class="page_number" *ngFor="let page of pagination.pages" [class.current]="pagination.getCurrent() === page.value" (click)="pagination.setCurrent(page.value)">
+               {{ page.label }}
+            </span>
+
+            <span class="next" [class.disabled]="pagination.isLastPage()" (click)="pagination.next()">
+                Next »
+            </span>
+        </div>
+    </pagination-template>
+
+</div>
+
+<div class="panel-group alarms" id="accordion" role="tablist" aria-multiselectable="true" data-step="3" data-intro="Click on an alarm to see its details">
+  <div *ngFor="let alarm of alarmsFiltered | paginate: config"
+      class="panel panel-default panel-sup-alarms panel-default-sup-alarms">
+    <div name="alarm-row" class="panel-heading panel-heading-sup-alarms" role="tab"
+      data-toggle="collapse" data-parent="#accordion" aria-expanded="false"
+      attr.data-target="#detail{{alarm.id}}">
+      <span *ngIf="!alarm.enabled" class="label label-default">Disabled</span>
+      <alarm-status *ngIf="alarm.enabled" [status]="alarm.state"></alarm-status>
+      {{alarm.name}}
+        <span class="pull-right">Subscribers : <span class="badge">{{alarm.subscriptions.length}}</span></span>
+    </div>
+    <div [id]="'detail' + alarm.id" class="panel-collapse collapse" role="tabpanel" aria-expanded="false">
+      <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-3 detailTitle">Description</div>
+            <div class="col-xs-9 pull-left">{{alarm.description}}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 detailTitle">Function (Graphite target)</div>
+            <div class="col-xs-9 pull-left"><kbd class="target">{{alarm.target}}</kbd></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 detailTitle">Thresholds (warning / error)</div>
+            <div class="col-xs-9 pull-left"><span class="label label-warning" style="font-size: small">{{alarm.warn}}</span> / <span class="label label-danger" style="font-size: small">{{alarm.error}}</span></div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12" style="padding-top: 10px">
+            <button id="alarms-details-alarm" (click)="gotoDetail(alarm.id)" data-dismiss="modal" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in"></span> Details</button>
+            <modal-subscription-form [alarmId]="alarm.id" (onUpdate)="gotoDetail(alarm.id)"></modal-subscription-form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<br>
+  <h3>Recent alerts</h3>
+  <label for="showAlertNoChangeStatus">Display alerts with no status change</label> <input id="showAlertNoChangeStatus" (click)="viewNoChangeAlerts()" type="checkbox">
+  <table class="responstable" *ngIf="alertsFiltered != null && alertsFiltered.length > 0" data-step="4" data-intro="Discover the last alerts">
+  	<thead>
+  	<tr>
+  		<th style="width:15%">When</th>
+    	<th style="width:25%">Alarm</th>
+  		<th style="width:10%">Measured value</th>
+  		<th style="width:10%">Warning Threshold</th>
+  		<th style="width:10%">Error Threshold</th>
+  		<th style="width:15%">Previous status</th>
+  		<th style="width:15%">New status</th>
+  	</tr>
+  	</thead>
+  	<tbody>
+  	<tr *ngFor="let alert of alertsFiltered">
+        <td [title]="(1000 * alert.timestamp) | date:'EEEE dd/MM/yyyy @ HH:mm:ss'">
+             <strong><span>{{(1000 * alert.timestamp) | amTimeAgo}}</span></strong>
+             &nbsp;<a><span class="glyphicon glyphicon-info-sign"></span></a>
+        </td>
+       <td><a (click)="gotoDetail(alert.checkId)" style="font-size: small; cursor: pointer" ><strong>{{alarmNames[alert.checkId] }}</strong></a></td>
+       <td><span style="font-size: small">{{ alert.value }}</span></td>
+       <td>{{ alert.warn }}</td>
+       <td>{{ alert.error }}</td>
+       <td style="font-size: small"><alarm-status [status]="alert.fromType"></alarm-status></td>
+       <td style="font-size: small"><alarm-status [status]="alert.toType"></alarm-status></td>
+  	</tr>
+  	</tbody>
+  </table>
+  <div class="alert alert-success" *ngIf="alertsFiltered == null || alertsFiltered.length == 0" role="alert">No alert found.</div>

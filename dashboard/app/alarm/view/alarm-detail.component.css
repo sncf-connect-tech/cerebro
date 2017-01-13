@@ -1,0 +1,80 @@
+/*
+ * This file is part of the Cerebro distribution.
+ * (https://github.com/voyages-sncf-technologies/cerebro)
+ * Copyright (C) 2017 VSCT.
+ *
+ * Cerebro is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, version 3 of the License.
+ *
+ * Cerebro is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.subscriptions {
+    font-size: small;
+}
+
+li {
+  list-style:none;
+}
+
+.card {
+  background-color: white;
+  border-radius:7px;
+  -moz-box-shadow: 5px 5px 10px 0px #656565;
+  -webkit-box-shadow: 5px 5px 10px 0px #656565;
+  -o-box-shadow: 5px 5px 10px 0px #656565;
+  box-shadow: 5px 5px 10px 0px #656565;
+  filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=10);
+  margin-bottom: 10px;
+  width: 33%;
+  min-height: 190px;
+  margin-right: 0.1%;
+}
+
+.cardInline {
+  background-color: white;
+  border-radius:7px;
+  -moz-box-shadow: 5px 5px 10px 0px #656565;
+  -webkit-box-shadow: 5px 5px 10px 0px #656565;
+  -o-box-shadow: 5px 5px 10px 0px #656565;
+  box-shadow: 5px 5px 10px 0px #656565;
+  filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=10);
+  margin-bottom: 10px;
+  width: 100%;
+  min-height: 130px;
+}
+
+.card-disabled {
+  background: rgba(226,226,226,1);
+  background: -moz-linear-gradient(-45deg, rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%);
+  background: -webkit-gradient(left top, right bottom, color-stop(0%, rgba(226,226,226,1)), color-stop(50%, rgba(219,219,219,1)), color-stop(51%, rgba(209,209,209,1)), color-stop(100%, rgba(254,254,254,1)));
+  background: -webkit-linear-gradient(-45deg, rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%);
+  background: -o-linear-gradient(-45deg, rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%);
+  background: -ms-linear-gradient(-45deg, rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%);
+  background: linear-gradient(135deg, rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2e2e2', endColorstr='#fefefe', GradientType=1 );
+}
+
+.logo{
+  float:right;
+}
+
+.card>div {
+  margin-bottom: 3%;
+}
+
+.moove {
+  display: inline;
+}
+
+.group_actions {
+	margin: 5px 0px;
+    text-align: right;
+}

@@ -1,0 +1,96 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="container">
+    <div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+    <h1>Subscriptions stats</h1>
+
+<br />
+<div class="row cardAdmin">
+    <div class="col-md-6">
+        <div class="panel panel-green">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <span class="glyphicon glyphicon-play stats_icon"></span>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge"><h3>{{nbActiveSubscriber}}</h3></div>
+                        <div>Active subscribers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-yellow">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <span class="glyphicon glyphicon-pause stats_icon"></span>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge"><h3>{{nbInactiveSubscription}}</h3></div>
+                        <div>Inactive subscribers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="well">
+      <p>These statistics only concern enabled alarms.</p>
+  </div>
+
+  <div class="col-md-6">
+  <h3>Top alarms (per active subscribers)</h3>
+  <table   class="table table-striped">
+      <thead>
+        <tr>
+            <th>Alarm</th>
+            <th>Active subscribers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let entry of topAlarmsByActiveSubscribers">
+            <td [title]="alarmIdName[entry[0]]"><a (click)="gotoDetail(entry[0])" style="cursor: pointer">{{alarmIdName[entry[0]] | emailSub}}</a></td>
+            <td>{{entry[1]}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+  <h3>Top subscribers (per active alarms)</h3>
+  <table  class="table table-striped">
+      <thead>
+        <tr>
+            <th>Subscriber</th>
+            <th>Subscriptions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let subscriber of topSubscribersByActiveAlarms">
+            <td [title]="subscriber[0]"><a href="mailto:{{subscriber[0]}}">{{subscriber[0] | emailSub}}</a></td>
+            <td>{{subscriber[1]}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>

@@ -1,0 +1,166 @@
+= *Cerebro: open alerting for DevOps teams*
+Cerebro Team <cerebro-team(at)framalistes.org>
+v0.5.0, 13 jan 2017
+:encoding: UTF-8
+:toc: macro
+
+toc::[5]
+
+
+== Design
+
+There is one supported backend for now: http://graphiteapp.org/[Graphite], the opensource timeseries database. Cerebro currently integrates with https://github.com/scobal/seyren[Seyren] to store alarms, schedule checks and send alerts. Why not use vanilla Seyren? Because we thought an on-top interface would better meet our requirements for managing large sets of alarms in a collaborative manner, and making alerting over various types of metrics more accessible to Graphite non-experts.
+
+We try to keep Cerebro as stateless as possible (over backends): no user profile, no ownership over alarms (this one is more a 'DevOps decision' than a 'stateless decision'), stateless authentication (we currently use https://jwt.io/[JWT] with http://www.keycloak.org/[Keycloak] for auth).
+
+Expect Cerebro to integrate with other backends in the future: https://www.elastic.co/fr/products/elasticsearch[Elasticsearch] / https://elastalert.readthedocs.io/[ElastAlert], possibly http://grafana.org/[Grafana 4] alerting feature, etc.
+
+Code structure (https://maven.apache.org/[Maven] modules) :
+
+* `dashboard` : graphical user interface, running https://angular.io/[Angular 2] (https://www.typescriptlang.org/[TypeScript], http://getbootstrap.com/[Bootstrap], etc.)
+* `docker` : https://www.docker.com/[Docker] / https://docs.docker.com/compose/[Compose] implementation to run a Graphite+Mongo+Seyren+Cerebro stack of containers
+* `selenium` : http://www.seleniumhq.org/[Selenium] integration tests over dashboard features
+* `services` : REST API over backends, running https://spring.io/[Spring] / https://www.oracle.com/java/index.html[Java]
+
+== Dependencies
+
+Runtime dependencies (see the _Run_ section):
+
+* Running http://graphiteapp.org/[Graphite] and https://github.com/scobal/seyren[Seyren] instances (we currently use Graphite 0.9.14 and Seyren 1.5.0)
+* https://www.oracle.com/fr/java/index.html[Java 8] to run the _Cerebro Services_ JAR
+* A Web server (we use Apache 2) to run the _Cerebro Dashboard_
+* SMTP service to send email notifications
+
+Static dependencies (libs and devtools) can be listed from build descriptors, namely the `pom.xml` files (incl. https://spring.io/[Spring], https://github.com/FasterXML/jackson[Jackson], http://www.seleniumhq.org/[Selenium], etc.) and `package.json` (incl. https://angular.io/[Angular 2], https://www.typescriptlang.org/[TypeScript], http://getbootstrap.com/[Bootstrap], http://introjs.com/[Introjs], etc.).
+
+== Build from sources
+
+Prerequisites:
+
+* https://www.oracle.com/fr/java/index.html[Java 8]
+* https://maven.apache.org/[Maven 3]
+
+To build Cerebro from sources, from project root folder:
+
+    $ mvn clean verify
+
+Once built, the services and dashboard archives are available in `target` subfolders.
+
+== Run with Docker
+
+=== TL;DR
+
+Easily run and play with Cerebro with the provided https://www.docker.com/[Docker] / https://docs.docker.com/compose/[Compose] implementation:
+
+    $ mvn clean verify
+    $ cd docker
+    $ docker-compose up
+
+Links:
+
+* Dashboard: http://localhost
+* Services healthcheck: http://localhost:8080/cerebro-services/health
+* Services API contract: http://localhost:8080/cerebro-services/v2/api-docs
+* Services API http://swagger.io/swagger-ui/[Swagger UI]: http://localhost:8080/cerebro-services/swagger-ui.html
+
+NOTE: Local IP may be different for Docker Toolbox users.
+
+You may want to check the sources in the `docker` module: `Dockerfile`, default properties, backends versions, etc.
+
+=== Compose details
+
+The `docker-compose up` command builds the src image (which contains sources and config files) then runs lots of things:
+
+- *Graphite* (v0.9.14): http://localhost:8081/
+* Docker image for Graphite: https://hub.docker.com/r/sitespeedio/graphite[sitespeedio/graphite:0.9.14]
+- *collectd* to feed Graphite with metrics
+- *MongoDB* (v3.2), required by Seyren
+- *Seyren* (v1.5.0): http://localhost:8000/
+
+    $ curl http://localhost:8888/api/checks
+    $ curl http://localhost:8888/api/alerts?start=0&items=20
+
+- *Cerebro Services*: http://localhost:8080/cerebro-services
+- *Cerebro Dashboard*: http://localhost
+
+== Run with Maven / NPM (dev)
+
+For development and local tests, we often use `spring-boot:run` or standard `java -jar`, plus https://www.npmjs.com/[NPM] to run the dashboard (Graphite and Seyren services must be running).
+
+Services layer:
+
+    $ cd services
+    $ mvn spring-boot:run
+
+Dashboard:
+
+    $ cd dashboard
+    $ npm install
+    $ npm start
+
+Links:
+
+* Dashboard: http://localhost:51010/
+* Services healthcheck: http://localhost:8080/cerebro-services/health
+* Services API contract: http://localhost:8080/cerebro-services/v2/api-docs
+* Services API http://swagger.io/swagger-ui/[Swagger UI]: http://localhost:8080/cerebro-services/swagger-ui.html
+
+== Run with Java / Apache (standard)
+
+For standard deployment run scenarios (meaning without Docker, Maven or NPM), we use standard `java -jar` (services) and https://httpd.apache.org/[Apache HTTPd] (dashboard).
+
+Services layer:
+
+    $ cd services
+    $ java -jar target/cerebro-services-1.0.0-SNAPSHOT.jar
+
+NOTE: that is not what we do (_make JAR not WAR_), but some might prefer to build a WAR then deploy it to _<insert_best_java_server_available>_.
+
+Dashboard:
+
+To run the dashboard (Angular 2 with routing) with Apache 2, extract the TAR.GZ file to HTTPd and check the `.htaccess` instructions:
+
+    RewriteEngine On
+    # If an existing asset or directory is requested go to it as it is
+    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+    RewriteRule ^ - [L]
+    # If the requested resource doesn't exist, use index.html
+    RewriteRule ^ /index.html
+
+NOTE: Any static resource Web server should do the job.
+
+== Configuration
+
+=== Service layer
+
+Location: `services/src/main/resources/config`.
+
+Main properties are:
+
+* From `email.properties`:
+** `server` - The SMTP service host
+** `port` - The SMTP service port
+** `sender` - The notification 'from' email
+
+* From `instance.properties`:
+** `seyren.host` - The Seyren backend instance
+** `graphite.sources[0].url` - The Graphite backend instance
+
+=== Dashboard
+
+Location: `dashboard/config`.
+
+Main properties are:
+
+* From `globals.json`:
+** `services_url` - The Cerebro service layer URL
+** `theme.headerImage` - The Cerebro top-background image URL
+** `theme.logo` - The Cerebro loading-logo image URL
+** `contacts.xxxxxx` - Insert your own wiki, email, issue tracker, etc. here, for users to get these links in the _Learn more..._ page
+
+IMPORTANT:: the Cerebro default logo/background images are links to external images from the X-Men licence/movies. Those images are not part of Cerebro sources, only their URL is embedded, merely illustrating a possible look'n'feel for the application. Please replace them with other resources of your own and customize the logo/background for your needs.
+
+=== Authentication?
+
+Even if authentication config is commented out by default, we use Cerebro with http://www.keycloak.org/[Keycloak] and stateless https://jwt.io/[JWT] tokens. Search `keycloak` in services and dashboard sources to known more (possibly testing it yourself). We should provide more explanations and auth code in the future.

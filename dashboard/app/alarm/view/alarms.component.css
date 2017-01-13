@@ -1,0 +1,94 @@
+/*
+ * This file is part of the Cerebro distribution.
+ * (https://github.com/voyages-sncf-technologies/cerebro)
+ * Copyright (C) 2017 VSCT.
+ *
+ * Cerebro is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, version 3 of the License.
+ *
+ * Cerebro is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.selected {
+	background-color: #CFD8DC !important;
+	color: white;
+}
+
+.error {
+	color: red;
+}
+
+.back-bluelight {
+	background-color: #EAF3F3;
+}
+
+.detailTitle {
+	font-weight: bold;
+}
+
+/*CSS de la pagination*/
+.custom-pagination {
+	margin: 5px;
+}
+
+.custom-pagination>span {
+	font-size: 11px;
+	list-style: none;
+	margin-right: 2px;
+	border: solid 1px #9aafe5;
+	color: #0e509e;
+	padding: 3px 6px;
+	text-decoration: none;
+	cursor: pointer;
+	
+	/* désactivation de la selection du texte */
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none; /* Chrome/Safari/Opera */
+	-khtml-user-select: none; /* Konqueror */
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none; /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+.custom-pagination .page_number {
+	min-width: 25px;
+	display: inline-block;
+}
+
+.custom-pagination .disabled {
+	border: solid 1px #DEDEDE;
+	color: #888888;
+	font-weight: bold;
+	margin-right: 2px;
+	padding: 3px 4px;
+	cursor: default;
+}
+
+.custom-pagination .next, .custom-pagination .previous {
+	font-weight: bold;
+	min-width: 80px;
+	display: inline-block;
+}
+
+.custom-pagination .current {
+	background: #2e6ab1;
+	color: #FFFFFF;
+	font-weight: bold;
+	padding: 4px 6px;
+}
+
+.custom-pagination>span:hover {
+	border: solid 1px #0e509e
+}
+
+.custom-pagination .disabled:hover {
+	border: solid 1px #DEDEDE;
+}

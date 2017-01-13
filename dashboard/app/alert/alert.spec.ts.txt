@@ -1,0 +1,20 @@
+import {Alert} from './alert';
+
+describe('Alert', () => {
+
+    let alert : Alert;
+  
+    beforeEach(() => {
+        Alert = new Alert("576154cf0cf2f53c12f4e898",
+            "575e665d0cf267d965c8ccce",null,"Zenith.BEN.WDI.WDI.LIL.PRD1.WAS.WDIOLIP14BEN.25_0.any.AF.getOutwardFares.part.TPF.3.vol.any.10min.count",60,90,"INFO","WARN",1465996494.797000000,"treqtzterz");
+    });
+
+    it('has id', () => {
+        expect(alert.id).toEqual("576154cf0cf2f53c12f4e898");
+    });
+
+    it('has name', () => {
+        expect(alert.checkId).toEqual('575e665d0cf267d965c8ccce');
+    });
+
+});

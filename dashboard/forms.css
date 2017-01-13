@@ -1,0 +1,73 @@
+/*
+ * This file is part of the Cerebro distribution.
+ * (https://github.com/voyages-sncf-technologies/cerebro)
+ * Copyright (C) 2017 VSCT.
+ *
+ * Cerebro is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, version 3 of the License.
+ *
+ * Cerebro is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.ng-valid[required] {
+    border-left: 5px solid #42A948; /* green */
+}
+
+.ng-invalid:not(form) {
+    border-left: 5px solid #a94442; /* red */
+}
+
+/*
+feature/SUPER-684
+[Cerebro] FIX : taille variable des checkboxes dans Chrome
+*/
+input[type=checkbox].form-control {
+    height: auto !important;
+}
+
+.toggle-button,
+.toggle-button:focus,
+.toggle-button:disabled {
+    color: darkred;
+    border-color: #babdb6;
+}
+
+.toggle-button:hover:enabled,
+.toggle-button.active:hover:disabled {
+    color: green;
+}
+
+.toggle-button.active,
+.toggle-button.active:focus {
+    color: green;
+}
+
+.toggle-button:hover:disabled,
+.toggle-button.active:hover:enabled {
+    color: darkred;
+}
+
+.toggle-status.btn-default.active {
+    color: white;
+    background-color: grey;
+    border-color: grey;
+}
+
+.panel-default-sup-alarms {
+    border-color: #50c1bb;
+}
+.panel-heading-sup-alarms {
+    padding: 5px 15px;
+    cursor: cell;
+}
+.panel-sup-alarms {
+    -webkit-box-shadow: 0 1px 1px rgb(195, 61, 61);
+    box-shadow: 0 1px 1px rgb(195, 61, 61);
+}
