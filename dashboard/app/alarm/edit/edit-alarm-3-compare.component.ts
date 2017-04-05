@@ -95,6 +95,7 @@ export class EditAlarm3CompareComponent implements OnInit {
     this.timeshiftAggregation = this.timeshiftAggregations[0].id;
 
     this.summarizeModes = [];
+    this.summarizeModes.push(new SelectOption("sum", "Sum over..."));
     this.summarizeModes.push(new SelectOption("avg", "Average over..."));
     this.summarizeModes.push(new SelectOption("max", "Maximum over..."));
     this.summarizeModes.push(new SelectOption("min", "Minimum over..."));
@@ -124,7 +125,7 @@ export class EditAlarm3CompareComponent implements OnInit {
     } else if (this.thresholdMode === "history") {
       // TODO : clean these 'append' code please
       if (this.analysisMode === "summarize") {
-        this.targetAnalyzedFunction = "summarize(" + this.alarm.target + ",'" + this.summarizeInterval + this.summarizeUnit + "','" + this.summarizeMode + ", true')";
+        this.targetAnalyzedFunction = "summarize(" + this.alarm.target + ",'" + this.summarizeInterval + this.summarizeUnit + "','" + this.summarizeMode + "', true)";
       } else {
         this.targetAnalyzedFunction = this.alarm.target;
       }
