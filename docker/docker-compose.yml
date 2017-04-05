@@ -3,7 +3,7 @@ version: '2'
 services:
   mongodb:
     image: mongo:3.2
-    command: mongod --smallfiles --quiet --logpath=/dev/null
+    command: mongod --smallfiles --quiet
     ports:
       - 27017:27017
 
@@ -26,11 +26,11 @@ services:
       INSTANCE_ID: seyren
 
   seyren:
-    image: java:8-jre
+    build: seyren/
     links:
       - mongodb
       - graphite
-    command: /bin/bash -c "wget https://github.com/scobal/seyren/releases/download/1.5.0/seyren-1.5.0.jar -nv && java -jar seyren-1.5.0.jar"
+    command: java -jar seyren-1.5.0.jar
     environment:
       MONGO_URL: mongodb://mongodb:27017/seyren
       GRAPHITE_URL: http://graphite
