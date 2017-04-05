@@ -14,6 +14,7 @@ services:
       - 2003:2003
     volumes:
       - ./properties/graphite.conf:/etc/nginx/sites-available/graphite.conf
+      - ./properties/graphTemplates.conf:/opt/graphite/conf/graphTemplates.conf
 
   collectd:
     image: listhub/collectd-write-graphite
