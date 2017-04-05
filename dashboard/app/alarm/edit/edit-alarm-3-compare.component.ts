@@ -40,6 +40,7 @@ export class EditAlarm3CompareComponent implements OnInit {
   thresholdModes: SelectOption[];
   thresholdMode: string;
   windowNullAsZero:boolean;
+  aberrationDelta: number;
   analysisModes: SelectOption[];
   analysisMode: string;
   timeshiftUnits: SelectOption[];
@@ -68,8 +69,10 @@ export class EditAlarm3CompareComponent implements OnInit {
     this.thresholdModes = [];
     this.thresholdModes.push(new SelectOption("static", "Fixed thresholds"));
     this.thresholdModes.push(new SelectOption("history", "History comparison (timeShift)"));
+	this.thresholdModes.push(new SelectOption("holtwinters", "Holt-Winters forecast deviation (holtWintersAberration)"));
     this.thresholdMode = this.thresholdModes[0].id;
     this.windowNullAsZero = false;
+	this.aberrationDelta = 3;
 
     this.analysisModes = [];
     this.analysisModes.push(new SelectOption("static", "A single value in the past"));
@@ -141,6 +144,8 @@ export class EditAlarm3CompareComponent implements OnInit {
 
       this.targetThresholdFunction = this.targetThresholdFunction + ")";
       this.targetThresholdFunction = this.targetThresholdFunction + (this.timeshiftNumber > 1 ? ")" : "");
+    } else if (this.thresholdMode === "holtwinters") {
+        this.targetThresholdFunction = "absolute(holtWintersAberration(" + this.targetCurrentFunction + "," + this.aberrationDelta + "))";
     }
 
     if (this.windowNullAsZero) {
@@ -175,15 +180,17 @@ export class EditAlarm3CompareComponent implements OnInit {
   getIllustrationSrc(): string {
     if (this.thresholdMode === 'static') {
       return 'app/alarm/edit/edit-alarm-3-compare.images/observe-' + this.observeMode + '-compare-static.png';
-    } else {
-      return  'app/alarm/edit/edit-alarm-3-compare.images/observe-' + this.observeMode + '-compare-' + this.thresholdMode + '-'
+    } else if (this.thresholdMode === 'history') {
+        return 'app/alarm/edit/edit-alarm-3-compare.images/observe-' + this.observeMode + '-compare-' + this.thresholdMode + '-'
           + this.analysisMode + '-' + (this.timeshiftNumber > 1 ? 'multi' : '1') + '.png';
+    } else if (this.thresholdMode === 'holtwinters') {
+        return 'app/alarm/edit/edit-alarm-3-compare.images/observe-' + this.observeMode + '-compare-holtwinters.png';
     }
   }
 
   initIntroTexts() {
     this.introTexts = [
-        "Compare recent value(s) to a fixed threshold, or to history (dynamic trend)",
+        "Compare recent value(s) to a fixed threshold, or to history (dynamic trend), or to Holt-Winters (algorithm) predictions",
         "Compare recent value(s) to a single value in the past, or a time range in the past",
         "You can use a single value or a time range as history, but also compute the average, the sum, etc. over several iterations (values or time ranges) in the past, shifting each time of X hours ou days or weeks...",
         "You can set thresholds as volumes (current value - history) or percentages (current value / history)",

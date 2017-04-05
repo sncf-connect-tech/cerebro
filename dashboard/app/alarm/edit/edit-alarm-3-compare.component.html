@@ -22,12 +22,11 @@
             taking into account the data historic.</p>
         <p>Note : actually nothing prevents from creating several alarms, to combine fixed threshold and variation thresholds.</p>
     </div>
-    <div><img [src]="getIllustrationSrc()" class="img-responsive center-block" /></div>
 </div>
 
 <form (ngSubmit)="submit()" #step3Form="ngForm">
-    <h3>Comparison</h3>
     <div>
+		<h3>Comparison</h3>
         <div class="row" [attr.data-step]="hidden ? null : 1" [attr.data-intro]="hidden ? null : introTexts[0]">
             <div class="col-sm-6 form-group">
                 <label for="thresholdMode">Comparison mode</label>
@@ -38,7 +37,10 @@
                 </select>
             </div>
         </div>
-        <div *ngIf="thresholdMode != 'static'">
+		<div *ngIf="!hidden"><img [src]="getIllustrationSrc()" class="img-responsive center-block" /></div>
+	</div>
+
+    <div *ngIf="thresholdMode == 'history'">
 
           <h3>History comparison</h3>
 
@@ -77,14 +79,14 @@
                   <div class="col-sm-1 form-group">
                 <input type="number" class="form-control" [(ngModel)]="timeshiftNumber" id="timeshiftNumber" name="timeshiftNumber" ngControl="timeshiftNumber"
                        placeholder="Number of time units to compare/aggregate" tabindex="6">
-            </div>
+				</div>
             <div class="col-sm-2 form-control-static"> times, shifting of </div>
             <div class="col-sm-3 form-group">
                 <select class="form-control" [(ngModel)]="timeshiftUnit" name="timeshiftUnit" ngControl="timeshiftUnit" tabindex="7">
                     <option *ngFor="let option of timeshiftUnits" [value]="option.id">{{option.label}}</option>
                 </select>
             </div>
-        </div>
+		  </div>
 
         <div class="row" *ngIf="timeshiftNumber > 1">
           <div class="col-sm-6 form-group">
@@ -118,13 +120,34 @@
                 <select class="form-control" [(ngModel)]="compareMethod" name="compareMethod" ngControl="compareMethod" tabindex="9">
                     <option *ngFor="let option of compareMethods" [value]="option.id">{{option.label}} ({{option.id}})</option>
                 </select>
-             </div>
             </div>
         </div>
+	</div>
+		
+	<div *ngIf="thresholdMode == 'holtwinters'">
+		<h3>Holt-Winters deviation</h3>
+
+		<div class="row">
+			<div class="col-sm-6 form-group"><label for="aberrationDelta">Delta (tolerance)</label></div>
+			<div class="col-sm-6 form-group">
+				<input type="number" min=1 max=10 step=1 class="form-control" [(ngModel)]="aberrationDelta" name="aberrationDelta"
+					   id="aberrationDelta" ngControl="aberrationDelta" tabindex="2">
+			</div>
+		</div>
+
+		<div class="well well-sm" role="alert">
+			<p>
+				Holt-Winters aberration is the deviation between Holt-Winters forecast and actual values. Delta is a tolerance factor, more or less strict to the algorithm.
+				More information about this algorithm can be found on the Web (for instance <a href="https://www.otexts.org/fpp/7/5" target="_holtwinters">here <span class="glyphicon glyphicon-info-sign"></span></a>).
+			</p>
+			<p>
+				Holt-Winters mode is generally recommended for daily-seasonal data.
+			</p>
+		</div>
     </div>
 
-    <h3>Thresholds</h3>
     <div>
+		<h3>Thresholds</h3>
         <div class="row" [attr.data-step]="hidden ? null : 5"
         [attr.data-intro]="hidden ? null : introTexts[4]">
             <div class="col-sm-6 form-group"><label for="warn-threshold">Warning threshold</label></div>
