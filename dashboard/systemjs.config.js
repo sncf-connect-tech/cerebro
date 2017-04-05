@@ -42,7 +42,7 @@
       '@angular/upgrade': 'npm:@angular/upgrade/bundles/upgrade.umd.js',
       // other libraries
       'rxjs':            'npm:rxjs',
-      'ng2-pagination':  'https://rawgit.com/michaelbromley/ng2-pagination/master/dist',
+      'ng2-pagination':  'node_modules/ng2-pagination/dist',
       'ng2-bs3-modal':   'node_modules/ng2-bs3-modal',
       'moment':          'node_modules/moment',
       'angular2-moment': 'node_modules/angular2-moment',
