@@ -1,6 +1,6 @@
 = *Cerebro: open alerting for DevOps teams*
 Cerebro Team <cerebro-team(at)framalistes.org>
-v0.5.0, 13 jan 2017
+v0.5.1, 23 oct 2017
 :encoding: UTF-8
 :toc: macro
 
@@ -26,7 +26,7 @@ _Whereas still a beta, we already use Cerebro over various types of production m
 
 * Supports alarms over http://graphiteapp.org/[Graphite] timeseries and email alerts for now. (More backends and alert types in the future.)
 * Use wizard-like forms to create basic, as well as advanced alarms:
-** Define basic fixed-thresholds alarms, as well as history-leveraging _targets_ (combining Graphite functions, such as `summarize` or `timeShift`)
+** Define basic fixed-thresholds alarms, as well as history-leveraging _targets_ (combining Graphite functions, such as `summarize`, `timeShift` or Holt-Winters forecasts)
 ** Follow natural-language instructions and illustrations to set alarm modes and options
 ** Preview data and thresholds results at each step (over 1h, 1d, 1w)
 * Browse, inspect, susbscribe to existing alarms:
@@ -39,7 +39,7 @@ _Whereas still a beta, we already use Cerebro over various types of production m
 * Leverage the REST API for programmatic usage (deploy alarms automatically with applications?)
 * Browse basic stats over alarms, alerts and subscribers
 * Get online help, links, info:
-** Contextual help from every page (_Prof. Xavier_)
+** Contextual help from every page, aka _Prof. Xavier_ (using http://introjs.com/[Intro.js])
 ** Customizable links to your wiki, chatroom, issues, mailing list...
 ** Technical details about the version (commit, author, build job, etc.)
 ** API online documentation (with http://swagger.io/swagger-ui/[Swagger UI])
@@ -61,7 +61,7 @@ The following instructions show how to create an alarm with Cerebro, as well as 
     $ cd docker
     $ docker-compose up
 
-* Open the Cerebro dashboard on http://localhost (IP may be different for Docker Toolbox users).
+* Open the Cerebro dashboard on http://localhost (IP may differ for Docker Toolbox and VM users).
 * Once the dashboard is loaded, click on the _Prof. Xavier_ button to get a short description of what you see. Click on _Learn more..._ to get more info and a bunch of external links.
 
 * Create your first alarm:
@@ -82,6 +82,8 @@ The following instructions show how to create an alarm with Cerebro, as well as 
 
 In addition to comments and labels in the user interface, the dashboard _Prof. Xavier_ button provides contextual information from for every page.
 
+Cerebro has been used to perform an https://cfp.devoxx.fr/2017/talk/JZK-8395/Introduction_a_la_detection_d'anomalies_avec_Graphite[introduction to Graphite-based anomaly detection] at Devoxx France. The talk is https://www.youtube.com/watch?v=Lw49lm0hTH4[available online] (in French).
+
 More user documentation will come soon.
 
 == Installation / Configuration
@@ -90,10 +92,10 @@ See the link:INSTALL.adoc[INSTALL.adoc] file for installation and configuration 
 
 == Code structure
 
-* `dashboard` : graphical user interface, running https://angular.io/[Angular 2] (https://www.typescriptlang.org/[TypeScript], http://getbootstrap.com/[Bootstrap], etc.)
+* `dashboard` : graphical user interface, running https://angular.io/[Angular] (https://www.typescriptlang.org/[TypeScript], http://getbootstrap.com/[Bootstrap], etc.)
 * `docker` : https://www.docker.com/[Docker] / https://docs.docker.com/compose/[Compose] implementation to run a Graphite+Mongo+Seyren+Cerebro stack of containers
 * `selenium` : http://www.seleniumhq.org/[Selenium] integration tests over dashboard features
-* `services` : REST API over backends, running https://spring.io/[Spring] / https://www.oracle.com/java/index.html[Java]
+* `services` : REST API over backends, running https://projects.spring.io/spring-boot/[Spring Boot] / https://www.oracle.com/java/index.html[Java]
 
 == License
 
