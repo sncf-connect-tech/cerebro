@@ -1,0 +1,106 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="jumbotron" [ngStyle]="background">
+    <h1 id="title">Cerebro <sup>(beta)</sup></h1>
+    <p><em>Open alerting services over Graphite and +</em></p>
+
+    <p class="jumbotron-buttons">
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#aboutModal" data-step="30"
+                data-intro="More information, Q&A, links, etc.">
+            <span class="glyphicon glyphicon-info-sign"></span>&nbsp;&nbsp;Learn more...
+        </button>
+    </p>
+</div>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="myModalLabel">About...</h2>
+            </div>
+            <div class="modal-body">
+                <p><a [href]="contacts.about.homepage" target="_home" title="Cerebro Home"><strong><em>Cerebro<sup>(beta)</sup></em>
+                </strong></a> is an open alerting system over Graphite, the opensource timeseries database. More backends in the future.</p>
+                <p>Shared by <em>{{contacts.about.author}}</em>. Dedicated to DevOps teams.</p>
+                <p>Version details (<em>commit</em>, <em>build</em>, etc.): <a href="MANIFEST.properties" target="_MANIFEST"
+                                                                               title="More details...">here</a>.</p>
+                <p>More information? Questions? Sources?</p>
+                <div>
+                    <a class="btn btn-info" role="button" [href]="contacts.documentation.url" target="_wiki">
+                        <span class="glyphicon glyphicon-info-sign"></span>&nbsp;&nbsp;{{contacts.documentation.name}}
+                    </a>
+                    <a class="btn btn-success" role="button" [href]="contacts.chat.url" target="_chat">
+                        <span class="glyphicon glyphicon-comment"></span>&nbsp;&nbsp;{{contacts.chat.name}}
+                    </a>
+                    <a class="btn btn-warning" role="button" [href]="contacts.email">
+                        <span class="glyphicon glyphicon-inbox"></span>&nbsp;&nbsp;Email
+                    </a>
+                    <a class="btn btn-danger" role="button" [href]="contacts.issueTracker.url" target="_issues">
+                        <span class="glyphicon glyphicon-record"></span>&nbsp;&nbsp;{{contacts.issueTracker.name}}
+                    </a>
+                    <a class="btn btn-primary" role="button" [href]="contacts.about.homepage" target="_home">
+                        <span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;Sources
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav>
+    <a id="my-alarms-tab" *ngIf="hasAuthentication" routerLink="/dashboard" data-step="20" data-intro="Quickly find the alarms you subscribed to"><span
+            class="glyphicon glyphicon-home"></span> My alarms</a>
+    <a id="all-alarms-tab" routerLink="/alarms" data-step="21" data-intro="Browse all alarms and alerts"><span
+            class="glyphicon glyphicon-th-list"></span> All alarms</a>
+    <a id="add-alarm-tab" routerLink="/alarms/add" data-step="22" data-intro="Create your own alarms"><span class="glyphicon glyphicon-plus-sign"></span>
+        Create an alarm...</a>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                data-step="23" data-intro="Discover who uses Cerebro, and how">
+            <span class="glyphicon glyphicon-dashboard"></span>&nbsp;Stats <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a routerLink="/admin/alarms"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;Alarm stats</a></li>
+
+            <li><a routerLink="/admin/subscriptions"><span class="glyphicon glyphicon-user"></span>&nbsp;Subscription stats</a></li>
+            <li><a routerLink="/admin/alerts"><span class="glyphicon glyphicon-fire"></span>&nbsp;Alert stats</a></li>
+        </ul>
+    </div>
+    <button href="javascript:void(0);" onclick="javascript:introJs().setOptions({'showProgress': false, 'showStepNumbers':false}).start();"
+            type="button" class="btn btn-success dropdown-toggle" data-step="24"
+            data-intro=" Ask the professor to explain each page">
+        <span class="glyphicon glyphicon-education"></span>&nbsp;Prof. Xavier
+    </button>
+    <a *ngIf="hasAuthentication" id="logout" (click)="logout()" class="logout"><span class="glyphicon glyphicon-log-out"></span> Sign out</a>
+</nav>
+<router-outlet></router-outlet>
+<div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+<br>
+<div class="pull-right">
+    <p><em>
+        <small><a [href]="contacts.about.homepage" target="_home" title="Cerebro Home"><strong>Cerebro</strong></a>
+            <a href="MANIFEST.properties" target="_MANIFEST" title="See details...">(version)</a>
+            by {{contacts.about.author}} 2016-2017
+        </small>
+    </em></p>
+</div>

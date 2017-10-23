@@ -1,0 +1,61 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Cerebro</title>
+  <meta charset="utf-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body role="document">
+<div class="container" role="main">
+  <cerebro-app>
+    <div class="text-center" id="logo-zone"></div>
+    <p class="text-center">Loading, please wait...</p>
+    <div class="col-xs-2 col-xs-offset-5">
+      <div class="progress">
+        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          <span class="sr-only"></span>
+        </div>
+      </div>
+    </div>
+    <script>
+        // Load logo from config
+        var request = new XMLHttpRequest();
+        request.open('GET', 'assets/globals.json', true);
+        request.onload = function() {
+            if (request.status >= 200 && request.status < 400) {
+                var data = JSON.parse(request.responseText);
+                if(data && data.theme.logo) {
+                    var elem = document.createElement("img");
+                    elem.src = data.theme.logo;
+                    elem.height = 128;
+                    elem.width= 128;
+                    document.getElementById("logo-zone").appendChild(elem);
+                }
+            }
+        };
+        request.send();
+    </script>
+  </cerebro-app>
+</div>
+</body>
+</html>

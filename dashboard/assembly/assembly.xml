@@ -28,23 +28,13 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}</directory>
+            <directory>${project.build.directory}/dist</directory>
             <outputDirectory>/</outputDirectory>
             <filtered>false</filtered>
             <includes>
-                <include>app/**/*</include>
-                <include>config/**/*</include>
-                <include>*.css</include>
-                <include>*.html</include>
-                <include>favicon.ico</include>
-                <include>node_modules/**/*</include>
-                <include>package.json</include>
-                <include>systemjs.config.js</include>
-                <include>bs-config.js</include>
-                <include>.htaccess</include>
+                <include>**/*</include>
             </includes>
             <fileMode>0754</fileMode>
-            <!--<directoryMode>0754</directoryMode>-->
         </fileSet>
     </fileSets>
     <files>

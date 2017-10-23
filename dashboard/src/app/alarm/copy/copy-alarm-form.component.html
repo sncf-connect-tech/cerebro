@@ -1,0 +1,300 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<bs-modal #copyAlarmModal [cssClass]="'very-large-modal'" (onDismiss)="onDismiss()">
+    <bs-modal-header>
+        <h3 class="modal-title">Duplication of the alarm {{alarm.name}}</h3>
+    </bs-modal-header>
+    <bs-modal-body>
+		<div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+		<!-- Alarm -->
+		<div [hidden]="step != 1">
+		    <div class="progress">
+		        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 33%">
+		            <span class="sr-only">Step 1/3</span>
+		        </div>
+		    </div>
+		    <div class="well">
+		        <p>Most alarm parameters can be edited. For more options or previews, use the <em>Create an alarm...</em> form.</p>
+		    </div>
+		    <h3>Parameters</h3>
+		    <form (ngSubmit)="onSubmitStep1()" #step1Form="ngForm">
+		        <div>
+		            <div class="row">
+		                <div class="col-sm-4 form-group"><label for="name">Name</label></div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="text" class="form-control" [(ngModel)]="alarm.name" id="name" name="name" ngControl="name" required #name="ngModel"
+                                   placeholder="Name (included in emails subjects)" maxlength="50">
+		                    <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+		                        The name is required.
+		                    </div>
+		                </div>
+		            </div>
+		            <div class="row">
+		                <div class="col-sm-4 form-group"><label for="description">Description</label></div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="text" class="form-control" [(ngModel)]="alarm.description" id="description" name="description" ngControl="description" required
+                                   #description="ngModel" placeholder="Description (included in the emails sent)" maxlength="250">
+		                    <div [hidden]="description.valid || description.pristine" class="alert alert-danger">
+		                        The description is required.
+		                    </div>
+		                </div>
+		            </div>
+		            <div class="row">
+		                <div class="col-sm-4 form-group">
+		                    <label for="target">Alarm function (<em>target</em>) <a href="https://graphite.readthedocs.org/en/0.9.12/functions.html" target="_functions"><span class="glyphicon glyphicon-info-sign"></span></a></label>
+		                </div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="text" class="form-control" [(ngModel)]="alarm.target" id="target" name="target" ngControl="target" required #target="ngModel"
+                                   placeholder="Target/Graphite key. the function 'keepLastValue' will be automatically added if absent.">
+		                    <div [hidden]="target.valid || target.pristine" class="alert alert-danger">
+		                        The Graphite key or function is required.
+		                    </div>
+		                </div>
+		            </div>
+					<div class="row">
+						<div class="col-sm-4 form-group">
+							<label for="graphiteBaseUrl">Datasource</label>
+						</div>
+						<div class="col-sm-8 form-group">
+							<select class="form-control" [(ngModel)]="alarm.graphiteBaseUrl" name="graphiteBaseUrl" ngControl="graphiteBaseUrl">
+								<option *ngFor="let source of sources" [value]="source">{{source}}</option>
+							</select>
+						</div>
+					</div>
+
+		            <div class="row">
+		                <div class="col-sm-4 form-group"><label for="warn">Warning threshold</label></div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="alarm.warn" id="warn" name="warn" ngControl="warn" required #warn="ngModel"
+                                   placeholder="Warning threshold">
+		                    <div [hidden]="warn.valid || warn.pristine" class="alert alert-danger">
+		                        The warning threshold is required.
+		                    </div>
+		                </div>
+		            </div>
+		            <div class="row">
+		                <div class="col-sm-4 form-group"><label for="error">Error threshold</label></div>
+		                <div class="col-sm-8 form-group">
+		                    <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="alarm.error" id="error" name="error" ngControl="error" required #error="ngModel"
+                                   placeholder="Error threshold">
+		                    <div [hidden]="error.valid || error.pristine" class="alert alert-danger">
+		                        The error threshold is required.
+		                    </div>
+		                </div>
+		            </div>
+
+		            <div class="row">
+		                <div class="col-xs-10 col-sm-4 form-group"><label for="allowNoData">Allow no data?</label></div>
+		                <div class="col-xs-2 col-sm-8 form-group">
+		                    <input type="checkbox" class="form-control" id="allowNoData" name="allowNoData" [(ngModel)]="allowNoData" ngControl="allowNoData">
+		                </div>
+		            </div>
+		        </div>
+		        <br>
+
+		        <div class="modal-footer">
+		            <button type="submit" class="btn btn-default" [disabled]="!step1Form.form.valid">
+		                Next <span class="glyphicon glyphicon-step-forward" [class.text-success]="step1Form.form.valid"></span>
+		            </button>
+		        </div>
+		    </form>
+		</div>
+
+		<!-- Subscription -->
+		<div [hidden]="step != 2">
+		    <div class="progress">
+		        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 66%">
+		            <span class="sr-only">Step 2/3</span>
+		        </div>
+		    </div>
+	        <div class="well">
+	            <p>Plan your notifications depending on the status, days and hours you want to be notified.</p>
+	            <p>Other people will be able to subscribe to the same alarm and choose their own filters.</p>
+	        </div>
+	        <form (ngSubmit)="onSubmitStep2()" #step2Form="ngForm">
+	            <h3>Subscription</h3>
+	            <div>
+	                <div class="row">
+	                    <div class="col-sm-6 form-group"><label for="subTarget">Email address</label></div>
+	                    <div class="col-sm-6 form-group">
+	                        <div class="input-group">
+	                            <span class="input-group-addon">@</span>
+	                            <input type="email" class="form-control" id="subTarget" name="subTarget" [(ngModel)]="alarm.subscriptions[0].target"
+	                                   ngControl="subscriptionTarget" required #subscriptionTarget="ngModel"
+	                                   placeholder="Email address (unique) for notifications">
+	                        </div>
+	                        <div [hidden]="subscriptionTarget.valid || subscriptionTarget.pristine" class="alert alert-danger">
+	                            The email address is required.
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="row">
+	                    <div class="col-lg-6 form-group"><label>Notifications for selected status</label></div>
+	                    <div class="col-lg-6 form-group">
+	                        <div class="btn-group" data-toggle="buttons">
+	                            <button type="button" data-toggle="button" (click)="switchIgnoreStatus('ignoreWarn')"
+	                                    [class]="isIgnoreStatus('ignoreWarn') ? 'btn toggle-status btn-default' : 'btn toggle-status btn-warning active'">
+	                                WARN <span class="label label-warning"><span *ngIf="isIgnoreStatus('ignoreWarn')">&nbsp;&nbsp;&nbsp;</span>
+	                            <span *ngIf="!isIgnoreStatus('ignoreWarn')" class="glyphicon glyphicon-bell"></span></span>
+	                            </button>
+	                            <button type="button" data-toggle="button" (click)="switchIgnoreStatus('ignoreError')"
+	                                    [class]="isIgnoreStatus('ignoreError') ? 'btn toggle-status btn-default' : 'btn toggle-status btn-danger active'">
+	                                ERROR <span class="label label-danger"><span *ngIf="isIgnoreStatus('ignoreError')">&nbsp;&nbsp;&nbsp;</span>
+	                            <span *ngIf="!isIgnoreStatus('ignoreError')" class="glyphicon glyphicon-bell"></span></span>
+	                            </button>
+	                            <button type="button" data-toggle="button" (click)="switchIgnoreStatus('ignoreOk')"
+	                                    [class]="isIgnoreStatus('ignoreOk') ? 'btn toggle-status btn-default' : 'btn toggle-status btn-success active'">
+	                                OK <span class="label label-success"><span *ngIf="isIgnoreStatus('ignoreOk')">&nbsp;&nbsp;&nbsp;</span>
+	                            <span *ngIf="!isIgnoreStatus('ignoreOk')" class="glyphicon glyphicon-bell"></span></span>
+	                            </button>
+	                            <button type="button" data-toggle="button" (click)="switchIgnoreStatus('ignoreUnknown')"
+	                                    [class]="isIgnoreStatus('ignoreUnknown') ? 'btn toggle-status btn-default' : 'btn toggle-status btn-default active'">
+	                                UNKNOWN <span class="label label-default"><span *ngIf="isIgnoreStatus('ignoreUnknown')">&nbsp;&nbsp;&nbsp;</span>
+	                            <span *ngIf="!isIgnoreStatus('ignoreUnknown')" class="glyphicon glyphicon-bell"></span></span>
+	                            </button>
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="well">
+	                    <p>By default, notifications are sent when the alarm status changes (eg. alarms already in <em>ERROR</em> do
+							not create new alert notifications, as long as their status remains the same).</p>
+	                    <p>One may choose to disable one's notifications for a given status. For example: being notified only when status
+							switches to <em>ERROR</em>, but not when back to normal.</p>
+	                </div>
+	                <div class="row">
+	                    <div class="col-lg-4 form-group"><label>Days of active notifications</label></div>
+	                    <div class="col-lg-8 form-group alarm_days-selector">
+	                        <div class="btn-group" data-toggle="buttons">
+	                            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('mo')" (click)="switchActive('mo')">Monday</button>
+	                            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('tu')" (click)="switchActive('tu')">Tuesday</button>
+	                            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('we')" (click)="switchActive('we')">Wednesday</button>
+	                            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('th')" (click)="switchActive('th')">Thursday</button>
+	                            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('fr')" (click)="switchActive('fr')">Friday</button>
+	                            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('sa')" (click)="switchActive('sa')">Saturday</button>
+	                            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="isActive('su')" (click)="switchActive('su')">Sunday</button>
+	                        </div>
+	                    </div>
+	                </div>
+
+                  <div class="row">
+                      <div class="col-sm-6 form-group"><label >Notifications active from {{alarm.subscriptions[0].fromTime | subscriptionTimeFormat}} to {{alarm.subscriptions[0].toTime | subscriptionTimeFormat}}</label></div>
+                      <div class="col-sm-6 form-group">
+                      <nouislider name="subTime" [config]="defaultSliderConfig" [(ngModel)]="someRange2" (ngModelChange)="onSliderChange($event)"></nouislider>
+			      </div>
+                  </div>
+
+	            </div>
+	            <div class="modal-footer">
+		            <button type="button" class="btn btn-default" (click)="step=1">
+		                Back <span class="glyphicon glyphicon-step-backward text-danger"></span>
+		            </button>
+		            <button type="submit" class="btn btn-default" [disabled]="!step2Form.form.valid">
+		                Next <span class="glyphicon glyphicon-step-forward" [class.text-success]="step2Form.form.valid"></span>
+		            </button>
+	            </div>
+	        </form>
+        </div>
+
+		<!-- Validation -->
+		<div [hidden]="!submitted">
+		    <div class="progress">
+		        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+		            <span class="sr-only">Step 3/3</span>
+		        </div>
+		    </div>
+		    <div class="well">
+		        <p>Check the modification previews, then finish to save the alarm.</p>
+		    </div>
+		    <h3>Parameters</h3>
+		    <div>
+		        <div class="row">
+		            <div class="col-xs-3">Name</div>
+		            <div class="col-xs-9  pull-left">{{ alarm.name }}</div>
+		        </div>
+		        <div class="row">
+		            <div class="col-xs-3">Description</div>
+		            <div class="col-xs-9 pull-left">{{ alarm.description }}</div>
+		        </div>
+		        <div class="row">
+		            <div class="col-xs-3">Alarm function (<em>target</em>) <a href="https://graphite.readthedocs.org/en/0.9.12/functions.html" target="_functions"><span class="glyphicon glyphicon-info-sign"></span></a></div>
+		            <div class="col-xs-9 pull-left"><kbd style="font-size: small">{{alarm.target}}</kbd></div>
+		        </div>
+		        <div class="row">
+		            <div class="col-xs-3">Thresholds (warning / error)</div>
+		            <div class="col-xs-9 pull-left"><span class="label label-warning" style="font-size: small">{{alarm.warn}}</span> / <span class="label label-danger" style="font-size: small">{{alarm.error}}</span></div>
+		        </div>
+		    </div>
+
+		    <h3>Preview</h3>
+		    <div class="row">
+		        <div class="col-lg-4">
+		            <a *ngIf="submitted" [href]="graphMaxiUrl('1h', 'Over 1 hour')" target="_overview"><img [src]="graphMiniUrl('1h', 'Over 1 hour')"></a>
+		        </div>
+		        <div class="col-lg-4">
+		            <a *ngIf="submitted" [href]="graphMaxiUrl('1d', 'Over 1 day')" target="_overview"><img [src]="graphMiniUrl('1d', 'Over 1 day')"></a>
+		        </div>
+		        <div class="col-lg-4">
+		            <a *ngIf="submitted" [href]="graphMaxiUrl('1w', 'Over 1 week')" target="_overview"><img [src]="graphMiniUrl('1w', 'Over 1 week')"></a>
+		        </div>
+		    </div>
+		    <br>
+	        <h3>Subscription</h3>
+	        <span class="badge" style="font-size: small"><span class="glyphicon glyphicon-user"></span> {{alarm.subscriptions[0].target}}</span>
+	        <span>subscribing to status </span>
+	        <div class="btn-group" data-toggle="buttons">
+	            <button type="button" data-toggle="button" class="btn btn-warning toggle-status active" disabled title="WARN"
+	                    *ngIf="!isIgnoreStatus('ignoreWarn')"><span class="glyphicon glyphicon-bell"></span></button>
+	            <button type="button" data-toggle="button" class="btn btn-danger toggle-status active" disabled title="ERROR"
+	                    *ngIf="!isIgnoreStatus('ignoreError')"><span class="glyphicon glyphicon-bell"></span></button>
+	            <button type="button" data-toggle="button" class="btn btn-success toggle-status active" disabled title="OK"
+	                    *ngIf="!isIgnoreStatus('ignoreOk')"><span class="glyphicon glyphicon-bell"></span></button>
+	            <button type="button" data-toggle="button" class="btn btn-default toggle-status active" disabled title="UNKNOWN"
+	                    *ngIf="!isIgnoreStatus('ignoreUnknown')"><span class="glyphicon glyphicon-bell"></span></button>
+	        </div>
+	        <span> on </span>
+	        <div class="btn-group" data-toggle="buttons">
+	            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].mo" disabled title="Monday">M</button>
+	            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].tu" disabled title="Tuesday">T</button>
+	            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].we" disabled title="Wednesday">W</button>
+	            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].th" disabled title="Thursday">T</button>
+	            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].fr" disabled title="Friday">F</button>
+	            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].sa" disabled title="Saturday">S</button>
+	            <button type="button" data-toggle="button" class="btn btn-default toggle-button" [class.active]="alarm.subscriptions[0].su" disabled title="Sunday">S</button>
+	        </div>
+	        <span>from {{alarm.subscriptions[0].fromTime | subscriptionTimeFormat}} to {{alarm.subscriptions[0].toTime | subscriptionTimeFormat}}</span>
+
+		    <br>
+		    <div class="modal-footer">
+		        <button class="btn btn-default" (click)="submitted=false;step=2">
+		            Back <span class="glyphicon glyphicon-step-backward text-danger"></span>
+		        </button>
+		        <button class="btn btn-default" data-dismiss="modal" (click)="saveAlarm();submitted=false;">
+		            <strong>Save</strong> <span class="glyphicon glyphicon-ok text-success"></span>
+		        </button>
+		    </div>
+		</div>
+
+    </bs-modal-body>
+</bs-modal>
+
+
+<button type="button" class="btn btn-default" (click)="copyAlarmModal.open()" title="Duplicate...">
+    <span class="glyphicon glyphicon-duplicate"></span>&nbsp;Duplicate...
+</button>

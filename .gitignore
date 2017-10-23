@@ -304,4 +304,4 @@ node_modules/
 #/dashboard/typings/
 !/dashboard/systemjs.config.js
 logs/
-!/dashboard/app/target/
+!/dashboard/src/app/target/

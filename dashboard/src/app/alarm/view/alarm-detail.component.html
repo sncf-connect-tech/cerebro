@@ -1,0 +1,264 @@
+<!--
+  ~ This file is part of the Cerebro distribution.
+  ~ (https://github.com/voyages-sncf-technologies/cerebro)
+  ~ Copyright (C) 2017 VSCT.
+  ~
+  ~ Cerebro is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, version 3 of the License.
+  ~
+  ~ Cerebro is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+<div *ngIf="alarm">
+
+    <h2>Alarm <em id="alarm-name-title">{{alarm.name}}</em></h2>
+    {{diagnostic}}
+
+    <h3>Status</h3>
+    <div data-step="1" data-intro="Check the last alarm status">
+        <div class="row">
+            <div class="col-xs-3">Status</div>
+            <div class="col-xs-9 pull-left" style="font-size: medium">
+                <span *ngIf="!alarm.enabled" class="label label-default">Disabled</span>
+                <alarm-status *ngIf="alarm.enabled" [status]="alarm.state"></alarm-status>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">Last check</div>
+            <div class="col-xs-9 pull-left">{{ lastCheckDate | date:"EEEE dd/MM/yyyy @ HH:mm:ss" }}</div>
+        </div>
+    </div>
+    <br>
+
+    <h3>Preview</h3>
+	<div class="panel-group" id="previews-panel" role="tablist" aria-multiselectable="true">
+		<div class="panel panel-info" data-step="2" data-intro="Browse some previews (click to enlarge)">
+			<div class="panel-heading" style="cursor: pointer" [style.font-weight]="bold" role="tab" data-toggle="collapse" data-parent="#previews-panel"
+				aria-expanded="true" data-target="#preview-target">
+                <span class="glyphicon glyphicon-eye-open"></span>&nbsp;&nbsp;Alarm function
+			</div>
+			<div id="preview-target" class="panel-collapse collapse in" role="tabpanel">
+				<target-overview [alarm]="alarm" [targetLabel]="alarm.target" [showTargetLabel]="true"></target-overview>
+			</div>
+		</div>
+		<div class="panel panel-info" data-step="3" data-intro="Sometimes it's useful to inspect raw data (without the functions)">
+            <div class="panel-heading" style="cursor: pointer" role="tab" data-toggle="collapse" data-parent="#previews-panel"
+                data-target="#preview-targetGraphiteKey">
+                <span class="glyphicon glyphicon-search"></span>&nbsp;&nbsp;Raw data
+            </div>
+            <div id="preview-targetGraphiteKey" class="panel-collapse collapse" role="tabpanel">
+                <div *ngFor="let targetGraphiteKey of targetGraphiteKeys">
+                    <target-overview [alarm]="alarm" [target]="targetGraphiteKey" [targetLabel]="targetGraphiteKey" [showThresholds]="false"
+                                     [showTargetLabel]="true" [aliasTarget]="false"></target-overview>
+                </div>
+            </div>
+        </div>
+	</div>
+
+	<br>
+
+    <h3>Parameters</h3>
+    <div data-step="4" data-intro="View all alarm parameters">
+        <div class="row">
+            <div class="col-xs-3 espace">ID / permalink</div>
+            <div class="col-xs-9  pull-left"><a [href]="'/alarms/' + alarm.id">{{alarm.id}} <span class="glyphicon glyphicon-pushpin"></span></a></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 espace">Name</div>
+            <div id="alarm-name" class="col-xs-9  pull-left">{{alarm.name}}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 espace">Description</div>
+            <div id="alarm-description" class="col-xs-9 pull-left">{{alarm.description}}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 espace">Alarm function <a href="https://graphite.readthedocs.org/en/0.9.12/functions.html" target="_functions"><span class="glyphicon glyphicon-info-sign"></span></a></div>
+            <div class="col-xs-9 pull-left"><kbd class="target">{{alarm.target}}</kbd></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 espace">Raw data</div>
+            <div class="col-xs-9 pull-left"><kbd name="alarm-graphite-key" *ngFor="let targetGraphiteKey of targetGraphiteKeys" class="target">{{targetGraphiteKey}}</kbd></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 espace">Datasource</div>
+            <div class="col-xs-9 pull-left"><a [href]="alarm.graphiteBaseUrl" target="_source">{{alarm.graphiteBaseUrl}}</a></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 espace">Thresholds (warning / error)</div>
+            <div class="col-xs-9 pull-left"><span id="alarm-warn-threshold" class="label label-warning" style="font-size: small">{{alarm.warn}}</span> / <span id="alarm-error-threshold" class="label label-danger" style="font-size: small">{{alarm.error}}</span></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3 espace">Sampling window </div>
+            <div class="col-xs-9 pull-left espace"><span class="label label-primary" style="font-size: small">{{alarm.from}}</span> / <span class="label label-primary" style="font-size: small">{{alarm.until}}</span></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">Allow no data?</div>
+            <div class="col-xs-9 pull-left"><input type="checkbox" [ngModel]="alarm.allowNoData" disabled></div>
+        </div>
+        <br>
+
+        <edit-alarm-form [alarm]="alarm" (onUpdate)="ngOnInit()" data-step="5" data-intro="Edit alarm parameters"></edit-alarm-form>
+        <copy-alarm-form [alarm]="alarm" (onUpdate)="ngOnInit()" data-step="6" data-intro="Duplicate the alarm to quickly create a new one"></copy-alarm-form>
+        <button *ngIf="!alarm.enabled" type="button" id="enabled-alarm" class="btn btn-success" (click)="updateEnabled(alarm)" [hidden]="alarm.enabled" data-step="7" data-intro="Enable/disable the alarm (ie. the checks)">
+        	<span class="glyphicon glyphicon-off"></span> Enable
+        </button>
+        <button *ngIf="alarm.enabled" type="button" id="disable-alarm" class="btn btn-warning" (click)="updateEnabled(alarm)" data-step="7" data-intro="Enable/disable the automatic alarm checking">
+        	<span class="glyphicon glyphicon-off"></span> Disable
+        </button>
+
+    </div>
+    <br>
+
+    <!--SUBSCRIBERS  -->
+    <h3 class="title">
+        <span class="glyphicon glyphicon-user"></span>&nbsp;Subscribers <span class="badge">{{alarm.subscriptions.length}}</span>
+        <button (click)="switchSubscriptionsInline()" class="btn-default logo" title="Change the layout (cards/ligns)" data-step="10" data-intro="Change the layout (cards or ligns)">
+            <span [class]="isSubscriptionsInline() ? 'logo glyphicon glyphicon-resize-small' : 'logo glyphicon glyphicon-resize-full'"></span>
+        </button>
+    </h3>
+
+    <div class="row" data-step="8" data-intro="Find subscribers to the alarm">
+        <div class="col-md-4" [class.cardInline]="isSubscriptionsInline()" [class.card]="!isSubscriptionsInline()"
+             [class.card-disabled]="!subscription.enabled"
+            *ngFor="let subscription of (alarm.subscriptions | sortSubscriptionPipe)">
+            <div>
+                <h3 title="{{subscription.target}}" class="header">
+                    <span *ngIf="isSupportedSubscription(subscription)">
+                        <a href="mailto:{{subscription.target}}">
+                            <span *ngIf="isSubscriptionsInline()">{{subscription.target}}</span>
+                            <span *ngIf="!isSubscriptionsInline()">{{subscription.target | emailSub}}</span>
+                        </a>
+                        <i class="glyphicon glyphicon-envelope logo" aria-hidden="true"
+                           title="Notification type: {{subscription.type}}"></i>
+                    </span>
+                    <span *ngIf="!isSupportedSubscription(subscription)">
+                        <span *ngIf="isSubscriptionsInline()">{{subscription.target}}</span>
+                        <span *ngIf="!isSubscriptionsInline()">{{subscription.target | emailSub}}</span>
+                        <i class="glyphicon glyphicon-ban-circle logo" aria-hidden="true"
+                           title="Read-only notification type: {{subscription.type}}"></i>
+                    </span>
+                </h3>
+            </div>
+            <div [class]="isSubscriptionsInline() ? 'moove' : ''">
+                For status
+                <button type="button" class="chip" data-toggle="button" class=" btn-warning toggle-status active" disabled
+                    title="WARN" style="font-size: xx-small" *ngIf="!subscription.ignoreWarn">
+                    <span class="glyphicon glyphicon-bell"></span>
+                </button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-danger toggle-status active" disabled
+                    title="ERROR" style="font-size: xx-small" *ngIf="!subscription.ignoreError">
+                    <span class="glyphicon glyphicon-bell"></span>
+                </button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-success toggle-status active" disabled
+                    title="OK" style="font-size: xx-small" *ngIf="!subscription.ignoreOk">
+                    <span class="glyphicon glyphicon-bell"></span>
+                </button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-default toggle-status active" disabled
+                    title="UNKNOWN" style="font-size: xx-small" *ngIf="!subscription.ignoreUnknown">
+                    <span class="glyphicon glyphicon-bell"></span>
+                </button>
+            </div>
+            <div [class]="isSubscriptionsInline() ? 'moove' : ''">
+                from <strong>{{subscription.fromTime | subscriptionTimeFormat}}</strong> to <strong>{{subscription.toTime | subscriptionTimeFormat}}</strong>
+            </div>
+            <div [class]="isSubscriptionsInline() ? 'moove' : ''">
+                on
+                <button type="button" class="chip" data-toggle="button" class=" btn-default toggle-button"
+                    style="font-size: xx-small" [class.active]="subscription.mo" disabled title="Monday">M</button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-default toggle-button"
+                    style="font-size: xx-small" [class.active]="subscription.tu" disabled title="Tuesday">T</button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-default toggle-button"
+                    style="font-size: xx-small" [class.active]="subscription.we" disabled title="Wednesday">W</button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-default toggle-button"
+                    style="font-size: xx-small" [class.active]="subscription.th" disabled title="Thursday">T</button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-default toggle-button"
+                    style="font-size: xx-small" [class.active]="subscription.fr" disabled title="Friday">F</button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-default toggle-button"
+                    style="font-size: xx-small" [class.active]="subscription.sa" disabled title="Saturday">S</button>
+                <button type="button" class="chip" data-toggle="button" class=" btn-default toggle-button"
+                    style="font-size: xx-small" [class.active]="subscription.su" disabled title="Sunday">S</button>
+            </div>
+
+            <div class="group_actions" *ngIf="isSupportedSubscription(subscription)" data-step="9" data-intro="Enable/disable, edit or delete a subscription">
+                <button type="button" name="enabled-subscription" class="btn btn-success" (click)="toggleSubscription(subscription)" *ngIf="!subscription.enabled" data-toggle="button" title="Enable">
+                    <span class="glyphicon glyphicon-off"></span>
+                </button>
+                <button type="button" name="disable-subscription" class="btn btn-warning" (click)="toggleSubscription(subscription)" *ngIf="subscription.enabled" data-toggle="button" title="Disable">
+                    <span class="glyphicon glyphicon-off"></span>
+                </button>
+                <modal-subscription-form [subscription]="subscription" [alarmId]="alarm.id" (onUpdate)="ngOnInit()"></modal-subscription-form>
+                <button type="button" name="remove-subscription" class="btn btn-danger" data-toggle="button" (click)="confirmSubscriptionDeletion(subscription)" title="Delete...">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br />
+    <modal-subscription-form [alarmId]="alarm.id" (onUpdate)="ngOnInit()" data-step="11" data-intro="Subscribe to the alarm"></modal-subscription-form>
+    <br>
+
+    <h3>Recent alerts</h3>
+    <div *ngIf="!isAlertsLoaded">
+      <span class="glyphicon glyphicon-refresh loading"></span> Loading... (it can take a while)
+    </div>
+    <div *ngIf="isAlertsLoaded">
+      <div>
+        <label for="showAlertNoChangeStatus">Display alerts with no status change</label>
+        <input id="showAlertNoChangeStatus" [(ngModel)]="showAlertNoChangeStatus" type="checkbox">
+      </div>
+
+      <table class="responstable" *ngIf="alerts != null && alerts.length > 0" data-step="12" data-intro="Check the recent alerts for this alarm">
+      	<thead>
+      	<tr>
+              <th>When</th>
+              <th>Measured value</th>
+              <th>Warning threshold</th>
+              <th>Error threshold</th>
+              <th>Previous status</th>
+              <th>New status</th>
+      	</tr>
+      	</thead>
+      	<tbody>
+      	<tr *ngFor="let alert of alerts">
+              <td [title]="(1000 * alert.timestamp) | date:'EEEE dd/MM/yyyy @ HH:mm:ss'">
+                  <strong><span>{{(1000 * alert.timestamp) | amTimeAgo}}</span></strong>
+                  &nbsp;<a><span class="glyphicon glyphicon-info-sign"></span></a>
+              </td>
+              <td><span style="font-size: small">{{ alert.value }}</span></td>
+              <td>{{ alert.warn }}</td>
+              <td>{{ alert.error }}</td>
+              <td style="font-size: small"><alarm-status [status]="alert.fromType"></alarm-status></td>
+              <td style="font-size: small"><alarm-status [status]="alert.toType"></alarm-status></td>
+          </tr>
+      	</tbody>
+      </table>
+      <div class="alert alert-success" *ngIf="alerts == null || alerts.length == 0" role="alert" data-step="12" data-intro="Check the recent alerts for this alarm">No alert found for the given parameters.</div>
+      <br/>
+    </div>
+
+    <bs-modal #subDeletionModal [size]="'lg'" (onClose)="deleteSubscription()" (onDismiss)="subscriptionForDeletion = null">
+        <bs-modal-header>
+            <h4 id="modal-delete">Subscription removal</h4>
+        </bs-modal-header>
+        <bs-modal-body *ngIf="subscriptionForDeletion != null">
+            <div>Are you sure about deleting <strong>{{subscriptionForDeletion.target}}</strong>'s subscription ?</div>
+            <div class='alert alert-warning' role='alert' *ngIf="alarm.subscriptions.length == 1">
+                <span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>
+                <span>&nbsp;<strong>Warning :</strong> if you remove this subscription, the alarm will also be removed.</span>
+            </div>
+        </bs-modal-body>
+        <bs-modal-footer>
+            <button type="button" class="btn btn-primary" (click)="subDeletionModal.close()" id="modal-delete-subscription-ok">OK</button>
+            <button type="button" class="btn btn-default" autofocus (click)="subDeletionModal.dismiss()" id="modal-delete-subscription-cancel">Cancel</button>
+        </bs-modal-footer>
+    </bs-modal>
+</div>
