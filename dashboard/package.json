@@ -17,7 +17,7 @@
     "lite": "lite-server",
     "typings": "typings install"
   },
-  "license": "GNU Affero General Public License v3",
+  "license": "AGPL-3.0",
   "dependencies": {
     "@angular/common": "2.2.1",
     "@angular/compiler": "2.2.1",
