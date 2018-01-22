@@ -82,7 +82,7 @@
 		            <div class="row">
 		                <div class="col-sm-4 form-group"><label for="warn">Warning threshold</label></div>
 		                <div class="col-sm-8 form-group">
-		                    <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="alarm.warn" id="warn" name="warn" ngControl="warn" required #warn="ngModel"
+		                    <input type="number" step="0.01" class="form-control" [(ngModel)]="alarm.warn" id="warn" name="warn" ngControl="warn" required #warn="ngModel"
                                    placeholder="Warning threshold">
 		                    <div [hidden]="warn.valid || warn.pristine" class="alert alert-danger">
 		                        The warning threshold is required.
@@ -92,7 +92,7 @@
 		            <div class="row">
 		                <div class="col-sm-4 form-group"><label for="error">Error threshold</label></div>
 		                <div class="col-sm-8 form-group">
-		                    <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="alarm.error" id="error" name="error" ngControl="error" required #error="ngModel"
+		                    <input type="number" step="0.01" class="form-control" [(ngModel)]="alarm.error" id="error" name="error" ngControl="error" required #error="ngModel"
                                    placeholder="Error threshold">
 		                    <div [hidden]="error.valid || error.pristine" class="alert alert-danger">
 		                        The error threshold is required.
