@@ -27,7 +27,7 @@ import { HttpModule }    from '@angular/http';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { BsModalModule }       from 'ng2-bs3-modal';
 import { MomentModule }        from 'angular2-moment';
-import { NouisliderModule }    from 'ng2-nouislider/src/nouislider';
+import { NouisliderModule }    from 'ng2-nouislider';
 import { ToastModule }         from 'ng2-toastr/ng2-toastr';
 
 import { AppComponent }         from './app.component';
